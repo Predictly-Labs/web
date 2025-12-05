@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export const About = () => {
   return (
-    <section className="relative py-24 bg-gray-50 overflow-hidden">
+    <section className="relative min-h-screen bg-gray-50 overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         <div>
           <motion.div
@@ -18,20 +18,34 @@ export const About = () => {
           </motion.div>
 
           <motion.h2
-            className="text-4xl lg:text-5xl font-light text-gray-900 leading-tight max-w-4xl mx-auto"
+            className="text-4xl lg:text-7xl font-light text-gray-900 leading-tight max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Predictly <span className="text-blue-500">redefines</span>{" "}
+            Predictly <span className="relative inline-block">
+              <span className="text-blue-600 font-semibold">
+                redefines
+              </span>
+              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-blue-600 rounded-full opacity-80"></span>
+            </span>{" "}
             prediction market
             <br />
-            that <span className="text-gray-500">empowers</span> professionals
-            and enthusiasts alike
+            that empowers <span className="relative inline-block">
+              <span className="text-emerald-600 font-semibold">
+                Fun, Profitable, and Zero Risk
+              </span>
+              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-emerald-600 rounded-full opacity-80"></span>
+            </span>
             <br />
             to embrace the{" "}
-            <span className="text-blue-500">future of predictions</span>.
+            <span className="relative inline-block">
+              <span className="text-pink-600 font-semibold">
+                future of predictions market
+              </span>
+              <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-pink-600 rounded-full opacity-80"></span>
+            </span>
           </motion.h2>
 
           <motion.div
