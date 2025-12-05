@@ -2,8 +2,7 @@
 
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
+import { Navbar } from './Navbar'
 
 interface HeroContentProps {
   title: string
@@ -30,8 +29,9 @@ export const Hero = () => {
   }
 
   return (
-    <section className="relative min-h-screen bg-white overflow-hidden py-20">
+    <section className="relative min-h-screen bg-gray-50 overflow-hidden py-20">
       <div className="container mx-auto px-6">
+        <Navbar />
         
         <div className="max-w-6xl mx-auto">
           
@@ -44,25 +44,15 @@ export const Hero = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
-                <span className="flex items-center gap-3">
-                  <Image
-                    src="/assets/logo/logo.png"
-                    alt="Predictly Logo"
-                    width={60}
-                    height={60}
-                    className="object-contain"
-                  />
-                  Predictly.
-                </span>
                 <br />
-                <span className="flex items-center gap-3">
+                <span className="flex items-center gap-3 mt-5">
                   Where Prediction Market
                 </span>
                 Meets Group Friends.
               </motion.h1>
             </div>
 
-            <div className="hidden lg:flex flex-col items-end text-right space-y-2 mt-30">
+            <div className="hidden lg:flex flex-col items-end text-right space-y-2 mt-22">
               <motion.p 
                 className="text-gray-600 max-w-xs text-sm text-right"
                 initial={{ opacity: 0, x: 30 }}
@@ -76,6 +66,9 @@ export const Hero = () => {
               <motion.button
                 onClick={handleStartNow}
                 className="bg-black text-white px-6 py-3 rounded-2xl font-open-runde font-semibold text-sm hover:bg-gray-800 transition-colors mt-4"
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6, type: "spring", stiffness: 100 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
