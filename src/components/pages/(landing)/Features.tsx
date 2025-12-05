@@ -53,7 +53,7 @@ const FeatureCard = ({
           </div>
         )}
         
-        <div className={dark ? "flex flex-col justify-center h-full" : "pt-20"}>
+        <div className={dark ? "flex flex-col justify-center h-full" : "pt-22"}>
           <h3
             className={`text-xl font-bold mb-3 ${
               dark ? "text-black" : "text-black"
@@ -108,21 +108,31 @@ export const Features = () => {
   ];
 
   return (
-    <section className="relative py-24 bg-white overflow-hidden">
+    <section className="relative min-h-screen bg-gray-50 overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         <motion.div
-          className="text-center mb-16"
+          className="mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-5xl font-medium text-black mb-4">
-            The Future of Prediction Market
-          </h2>
+          <div>
+            <h2 className="text-5xl lg:text-5xl font-medium text-black mb-4">
+              The Future of Prediction Market
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mb-8">
+              Predictly is a social prediction platform that puts your community and your experience first.
+            </p>
+          </div>
+          
+          <div className="relative w-full">
+            <div className="absolute left-0 w-16 h-0.5 bg-gray-900 rounded-full"></div>
+            <div className="w-full h-px bg-gray-200"></div>
+          </div>
         </motion.div>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[500px]">
             <FeatureCard
               title={features[0].title}
