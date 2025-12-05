@@ -1,6 +1,7 @@
 import { Hero } from './Hero'
 import { About } from './About'
 import { Features } from './Features'
+import { Oracles } from './Oracles'
 import { Navbar } from './Navbar'
 
 export default function LandingIndex() {
@@ -10,6 +11,7 @@ export default function LandingIndex() {
       <Hero />
       <About />
       <Features />
+      <Oracles />
     </main>
   )
 }
