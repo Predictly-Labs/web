@@ -55,7 +55,7 @@ const FeatureCard = ({
         
         <div className={dark ? "flex flex-col justify-center h-full" : "pt-22"}>
           <h3
-            className={`text-xl font-bold mb-3 ${
+            className={`text-xl font-medium mb-3 ${
               dark ? "text-black" : "text-black"
             }`}
           >

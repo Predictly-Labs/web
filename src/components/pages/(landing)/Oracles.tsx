@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { OrbitingCircles } from "@/components/ui/orbiting-circles";
+import { FaBolt, FaChartLine, FaShieldAlt } from "react-icons/fa";
 
 const PythLogo = () => (
   <Image
@@ -26,8 +27,16 @@ export const Oracles = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-6">
-            Powered by <span className="font-bold">Pyth Oracles</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium text-gray-900 mb-6 flex items-center justify-center gap-4">
+            Powered by 
+            <Image
+              src="/assets/logo/pyth-logo.png"
+              alt="Pyth Network"
+              width={60}
+              height={60}
+              className="object-contain"
+            />
+            <span className="font-bold">Pyth Oracles</span>
           </h2>
           <p className="text-gray-600 text-lg md:text-xl max-w-3xl mx-auto px-4 leading-relaxed font-light">
             Real-time data feeds from the most trusted oracle networks in Web3
@@ -53,17 +62,26 @@ export const Oracles = () => {
               Our seamless integration ensures accurate, real-time data streaming for all prediction markets, enabling users to make informed decisions with the most up-to-date information available.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div className="space-y-2">
+              <div className="space-y-4">
+                <div className="flex justify-center">
+                  <FaBolt className="text-xl text-black" />
+                </div>
                 <div className="text-sm text-gray-500 uppercase tracking-wide">Price Feeds</div>
-                <div className="text-sm font-semibold text-gray-900">Real-time Updates</div>
+                <div className="text-sm font-medium text-gray-900">Real-time Updates</div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
+                <div className="flex justify-center">
+                  <FaChartLine className="text-xl text-black" />
+                </div>
                 <div className="text-sm text-gray-500 uppercase tracking-wide">Market Data</div>
-                <div className="text-sm font-semibold text-gray-900">Accurate Predictions</div>
+                <div className="text-sm font-medium text-gray-900">Accurate Predictions</div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-4">
+                <div className="flex justify-center">
+                  <FaShieldAlt className="text-xl text-black" />
+                </div>
                 <div className="text-sm text-gray-500 uppercase tracking-wide">Data Reliability</div>
-                <div className="text-sm font-semibold text-gray-900">Institutional Grade</div>
+                <div className="text-sm font-medium text-gray-900">Institutional Grade</div>
               </div>
             </div>
           </motion.div>
