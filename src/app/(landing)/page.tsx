@@ -1,5 +1,5 @@
-import { Hero } from '@/components/pages/(landing)'
+import LandingIndex from '@/components/pages/(landing)'
 
 export default function LandingPage() {
-  return <Hero />
+  return <LandingIndex />
 }
