@@ -23,7 +23,7 @@ export function OrbitingCircles({
   radius = 160,
   path = true,
   iconSize = 30,
-  speed = 1,
+  speed = 0.8,
   ...props
 }: OrbitingCirclesProps) {
   const calculatedDuration = duration / speed
@@ -36,7 +36,7 @@ export function OrbitingCircles({
           className="pointer-events-none absolute inset-0 size-full"
         >
           <circle
-            className="stroke-black/10 stroke-1 dark:stroke-white/10"
+            className="stroke-pink-300/50 stroke-1 dark:stroke-white/10"
             cx="50%"
             cy="50%"
             r={radius}
