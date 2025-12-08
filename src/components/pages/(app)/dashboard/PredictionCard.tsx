@@ -5,7 +5,7 @@ export const PredictionCard = () => {
     <div
       className="rounded-4xl p-6 relative overflow-hidden h-185 w-100"
       style={{
-        backgroundImage: "url('/assets/main/background/eth-background.png')",
+        backgroundImage: "url('/assets/main/background/move-bg.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
