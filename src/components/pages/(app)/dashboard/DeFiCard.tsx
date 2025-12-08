@@ -36,12 +36,12 @@ export const DefiCard = () => {
         {defiProtocols.map((protocol, index) => (
           <div key={index} className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full overflow-hidden shadow-sm">
+              <div className="rounded-full overflow-hidden shadow-sm">
                 <Image
                   src={protocol.logo}
                   alt={protocol.name}
-                  width={44}
-                  height={44}
+                  width={30}
+                  height={30}
                   className="object-cover"
                 />
               </div>
