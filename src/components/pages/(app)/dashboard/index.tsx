@@ -23,8 +23,11 @@ export const Dashboard = () => {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-medium text-black mb-2">My Dashboard</h1>
-          <div className="flex items-center gap-4 text-sm text-white/80"></div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">My Dashboard</h1>
+            <p className="text-lg text-gray-600 mb-3">Welcome back! Here's what's happening with your predictions.</p>
+            <div className="border-b border-gray-200"></div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-12">

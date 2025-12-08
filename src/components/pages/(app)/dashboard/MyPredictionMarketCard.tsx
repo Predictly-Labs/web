@@ -48,7 +48,7 @@ export const MyPredictionMarketCard = () => {
   return (
     <div className="bg-white rounded-3xl p-6 border border-gray-50 w-163 h-100">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-medium text-gray-900">Your Predictions</h3>
+        <h3 className="text-lg font-medium text-gray-900">My Predictions</h3>
       </div>
 
       <div className="space-y-4">
