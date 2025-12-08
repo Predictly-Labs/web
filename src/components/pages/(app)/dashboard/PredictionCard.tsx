@@ -22,8 +22,8 @@ export const PredictionCard = () => {
         </div>
         <div className="bg-white/15 backdrop-blur-lg rounded-3xl border border-white/20 p-8 space-y-6 -mx-2">
           <div className="space-y-2">
-            <h4 className="text-2xl font-medium text-slate-800">Market Analytics</h4>
-            <p className="text-sm text-slate-600">Real-time predictions & market insights</p>
+            <h4 className="text-2xl font-medium text-slate-800">Create your prediction</h4>
+            <p className="text-sm text-gray-600 font-medium">Create your prediction with your friends group</p>
           </div>
           
           <button className="cursor-pointer w-full bg-white/25 backdrop-blur-sm border border-white/30 text-slate-800 py-4 rounded-full font-medium hover:bg-white/35 transition-all duration-300 flex items-center justify-center gap-3">

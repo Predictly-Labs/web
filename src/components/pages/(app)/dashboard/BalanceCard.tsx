@@ -1,69 +1,48 @@
 "use client";
 
+import Image from "next/image";
+
 export const BalanceCard = () => {
   return (
-    <div 
-      className="rounded-2xl p-6 text-white h-80 relative overflow-hidden"
-      style={{
-        backgroundImage: "url('/assets/main/background/4.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat"
-      }}
-    >
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
-      
-      <div className="relative z-10">
-        <div className="absolute top-4 right-4">
-          <div className="text-lg font-bold drop-shadow-lg">VISA</div>
+    <div className="bg-white/15 backdrop-blur-lg rounded-3xl p-8 h-80 w-80 shadow-lg border border-gray-50">
+      <div className="flex items-center justify-between mb-8">
+        <h3 className="text-xl font-medium text-gray-900">Token Balance</h3>
+        <div className="flex gap-2">
+          <button className="w-8 h-8 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zM6 6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H8a2 2 0 01-2-2V6z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+            <Image 
+              src="/assets/logo/logo-coin/move-logo.jpeg"
+              alt="Movement Logo"
+              width={48}
+              height={48}
+              className="rounded-full"
+            />
+          </div>
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900">Movement</h4>
+            <p className="text-sm text-gray-500">$MOVE Token</p>
+          </div>
         </div>
 
-        <div className="absolute bottom-0 right-0 opacity-20">
-          <svg className="w-32 h-32" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-          </svg>
-        </div>
-
-        <div className="h-full flex flex-col">
-          <div className="flex-1">
-            <h3 className="text-lg font-medium mb-4 opacity-90 drop-shadow-lg">Virtual cards</h3>
-          
-            <div>
-              <div className="text-sm opacity-75 mb-1">Total Balance</div>
-              <div className="text-3xl font-bold mb-1 drop-shadow-lg">$6,010.29</div>
-              <div className="text-sm opacity-75">+4.21% last week</div>
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-end gap-3">
+            <h2 className="text-4xl font-bold text-gray-900">2,847.52</h2>
+            <span className="text-lg text-gray-400 mb-1">MOVE</span>
           </div>
-
-          <div className="space-y-3">
-            <div className="bg-white/30 backdrop-blur-sm rounded-lg p-3">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="text-sm opacity-75">Online</div>
-                  <div className="font-semibold">72%</div>
-                </div>
-                <div className="w-12 h-2 bg-white/30 rounded-full overflow-hidden">
-                  <div className="w-9 h-full bg-white rounded-full"></div>
-                </div>
-              </div>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-semibold text-gray-600">≈ $12,435.78</span>
+            <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+              +12.4%
             </div>
-
-            <div className="bg-white/30 backdrop-blur-sm rounded-lg p-3">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="text-sm opacity-75">Partner</div>
-                  <div className="font-semibold">28%</div>
-                </div>
-                <div className="w-12 h-2 bg-white/30 rounded-full overflow-hidden">
-                  <div className="w-3 h-full bg-white rounded-full"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center text-xs opacity-75 mt-4">
-            <span>•••• 4852</span>
-            <span>09/28</span>
           </div>
         </div>
       </div>

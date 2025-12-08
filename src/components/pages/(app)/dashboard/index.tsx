@@ -4,30 +4,28 @@ import { PredictionCard } from "./PredictionCard";
 import { ActivityCard } from "./ActivityCard";
 import { BalanceCard } from "./BalanceCard";
 import { SpentCard } from "./SpentCard";
-import { ContractCard } from "./ContractCard";
+import { DefiCard } from "./DeFiCard";
 import { StatsCard } from "./StatsCard";
 
 export const Dashboard = () => {
   return (
     <div 
-      className="p-6 min-h-screen relative"
-      style={{
-        backgroundImage: "url('/assets/main/background/1.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed"
-      }}
+      className="p-6 min-h-screen relative bg-[#f7f5fa]"
+      // style={{
+      //   backgroundImage: "url('/assets/main/background/1.jpeg')",
+      //   backgroundSize: "cover",
+      //   backgroundPosition: "center",
+      //   backgroundRepeat: "no-repeat",
+      //   backgroundAttachment: "fixed"
+      // }}
     >
       <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-medium text-white mb-2 drop-shadow-lg">Client Dashboard</h1>
+          <h1 className="text-3xl font-medium text-black mb-2">My Dashboard</h1>
           <div className="flex items-center gap-4 text-sm text-white/80">
-            <span>🏠 Home Page</span>
-            <span>→</span>
-            <span>📊 Dashboard</span>
+          
           </div>
         </div>
 
@@ -36,16 +34,16 @@ export const Dashboard = () => {
             <PredictionCard />
           </div>
           
-          <div className="md:col-span-1 lg:col-span-1 xl:col-span-1 ml-20">
+          <div className="md:col-span-1 lg:col-span-1 xl:col-span-1 ml-22">
             <ActivityCard />
           </div>
           
-          <div className="md:col-span-1 lg:col-span-1 xl:col-span-1">
+          <div className="md:col-span-1 lg:col-span-1 xl:col-span-1 ml-24">
             <BalanceCard />
           </div>
           
-          <div className="md:col-span-1 lg:col-span-1 xl:col-span-1">
-            <ContractCard />
+          <div className="md:col-span-1 lg:col-span-1 xl:col-span-1 ml-26">
+            <DefiCard />
           </div>
           
           {/* <div className="md:col-span-2 lg:col-span-2 xl:col-span-2">
