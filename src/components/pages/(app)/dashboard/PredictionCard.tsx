@@ -16,7 +16,7 @@ export const PredictionCard = () => {
       <div className="relative z-10 h-full flex flex-col">
         <div className="flex items-start justify-between mb-8">
           <h3 className="text-xl font-medium text-black/80">
-            Prediction Market
+            Let's create your Prediction Market with your friends!
           </h3>
         </div>
 
