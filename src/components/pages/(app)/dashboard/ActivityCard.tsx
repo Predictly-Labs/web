@@ -12,7 +12,7 @@ export const ActivityCard = () => {
   ];
 
   return (
-    <div className="bg-white/15 backdrop-blur-lg rounded-4xl p-8 h-80 w-80 shadow-lg border border-gray-50">
+    <div className="bg-white rounded-4xl p-8 h-80 w-80 border border-gray-50">
       <div className="flex items-center justify-between mb-8">
         <h3 className="text-xl font-medium text-gray-900">Activity</h3>
         <div className="flex gap-2">
