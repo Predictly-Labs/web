@@ -103,7 +103,7 @@ export const Hero = () => {
             
             <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-50 backdrop-blur-md rounded-2xl p-2 flex items-center justify-center gap-2 0 w-50 ">
               <span className="text-gray-900 font-medium text-md">Build on</span>
-              <Image
+              <img
                 src="/assets/logo/movement-logo.png"
                 alt="Movement Labs"
                 width={80}

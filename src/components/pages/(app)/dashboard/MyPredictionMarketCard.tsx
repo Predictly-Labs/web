@@ -47,8 +47,8 @@ export const MyPredictionMarketCard = () => {
 
   return (
     <div className="bg-white rounded-3xl p-6 border border-gray-50 w-163 h-100">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-medium text-gray-900">My Predictions</h3>
+      <div className="flex items-center justify-between mb-[-4]">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">My Predictions</h3>
       </div>
 
       <div className="space-y-4">
@@ -95,7 +95,7 @@ export const MyPredictionMarketCard = () => {
       </div>
 
       <div className="mt-2 pt-3 border-t border-gray-100 text-center">
-        <button className="bg-black text-white py-2 px-4 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 mx-auto">
+        <button className="bg-black text-white py-2 px-4 rounded-full text-xs font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 mx-auto">
           <span>View All Predictions</span>
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
