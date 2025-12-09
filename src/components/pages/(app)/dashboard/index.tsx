@@ -6,6 +6,7 @@ import { BalanceCard } from "./BalanceCard";
 import { MyPredictionMarketCard } from "./MyPredictionMarketCard";
 import { DefiCard } from "./DeFiCard";
 import { GroupCard } from "./GroupCard";
+import Sidebar from "../../../ui/Sidebar";
 
 export const Dashboard = () => {
   return (
@@ -20,6 +21,7 @@ export const Dashboard = () => {
       // }}
     >
       <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+      <Sidebar />
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-8">
