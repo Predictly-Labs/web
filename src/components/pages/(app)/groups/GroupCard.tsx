@@ -11,6 +11,20 @@ interface GroupMember {
   isOwner?: boolean;
 }
 
+interface MarketData {
+  id: string;
+  title: string;
+  description: string;
+  endDate: string;
+  totalPool: number;
+  participants: number;
+  status: 'active' | 'closed' | 'pending';
+  category: string;
+  currentOdds?: number;
+  createdBy: string;
+  createdAt: string;
+}
+
 interface GroupData {
   id: string;
   name: string;
@@ -23,7 +37,7 @@ interface GroupData {
   members: GroupMember[];
   createdAt: string;
   isPrivate: boolean;
-  markets?: any[];
+  markets: MarketData[];
 }
 
 interface GroupCardProps {

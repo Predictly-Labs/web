@@ -170,22 +170,33 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
   const closedMarkets = displayMarkets.filter(m => m.status === 'closed');
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">Market History</h2>
-        <button
-          onClick={onCreateMarket}
-          className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          Create Prediction Market
-        </button>
-      </div>
+    <div 
+      className="space-y-8 relative p-6 rounded-3xl overflow-hidden"
+      style={{
+        backgroundImage: "url('/assets/main/background/bg-market.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="absolute inset-0 bg-white/70"></div>
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={onCreateMarket}
+            className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
+          >
+            <div className="bg-white rounded-full p-1">
+              <Plus className="w-2 h-2 text-black" />
+            </div>
+            Create Prediction Market
+          </button>
+        </div>
 
       {activeMarkets.length > 0 && (
         <section>
-          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-green-500" />
+          <h3 className="text-lg font-medium text-gray-900 mb-5 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-black" />
             Active Markets ({activeMarkets.length})
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -202,11 +213,11 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
 
       {closedMarkets.length > 0 && (
         <section>
-          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-medium text-gray-900 mt-4 flex items-center gap-2">
             <Calendar className="w-5 h-5 text-gray-500" />
             Closed Markets ({closedMarkets.length})
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
             {closedMarkets.map(market => (
               <MarketCard 
                 key={market.id} 
@@ -227,6 +238,7 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 };

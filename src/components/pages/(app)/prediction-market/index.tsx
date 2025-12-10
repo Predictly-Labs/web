@@ -97,7 +97,8 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-100">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-2 border border-gray-100" 
+        >
           {showCreateForm ? (
             <div>
               <div className="mb-6 flex items-center justify-between">
