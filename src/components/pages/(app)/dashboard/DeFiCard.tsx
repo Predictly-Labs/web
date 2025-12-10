@@ -28,9 +28,19 @@ export const DefiCard = () => {
   ];
 
   return (
-    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-gray-50 w-full h-auto min-h-[280px] sm:min-h-[320px]">
+    <div 
+      className="rounded-3xl p-4 sm:p-8 w-full h-auto min-h-[280px] relative overflow-hidden"
+      style={{
+        backgroundImage: "url('/assets/main/background/bg-nav.jpeg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="absolute inset-0 bg-white/70"></div>
+      <div className="relative z-10">
       <h3 className="text-xl font-medium text-black mb-6">
-        DeFi Protocol
+        Yield
       </h3>
       <div className="space-y-7">
         {defiProtocols.map((protocol, index) => (
@@ -59,6 +69,7 @@ export const DefiCard = () => {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

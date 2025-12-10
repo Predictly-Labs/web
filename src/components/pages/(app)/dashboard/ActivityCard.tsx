@@ -12,7 +12,13 @@ export const ActivityCard = () => {
   ];
 
   return (
-    <div className="bg-white rounded-4xl p-4 sm:p-8 h-auto min-h-[280px] w-full border border-gray-50 sm:min-h-[320px]">
+    <div className="bg-gray-50 rounded-4xl p-4 sm:p-8 h-auto min-h-[280px] w-full"
+     style={{
+            backgroundImage: "url('/assets/main/background/bg-nav.jpeg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}>
       <div className="flex items-center justify-between mb-8">
         <h3 className="text-xl font-medium text-gray-900">Activity</h3>
         <div className="flex gap-2">
@@ -56,7 +62,7 @@ export const ActivityCard = () => {
         
         <div className="flex justify-between">
           {weekData.map((item) => (
-            <span key={item.day} className="text-xs text-gray-400">{item.day}</span>
+            <span key={item.day} className="text-xs text-black-400">{item.day}</span>
           ))}
         </div>
       </div>

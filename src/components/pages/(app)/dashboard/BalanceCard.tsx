@@ -4,7 +4,17 @@ import Image from "next/image";
 
 export const BalanceCard = () => {
   return (
-    <div className="bg-white rounded-3xl p-4 sm:p-8 h-auto min-h-[280px] w-full border border-gray-50 sm:min-h-[320px]">
+    <div 
+      className="rounded-3xl p-4 sm:p-8 h-auto min-h-[280px] w-full sm:min-h-[320px] relative overflow-hidden"
+      style={{
+        backgroundImage: "url('/assets/main/background/bg-nav.jpeg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="absolute inset-0 bg-white/70"></div>
+      <div className="relative z-10">
       <div className="flex items-center justify-between mb-8">
         <h3 className="text-xl font-medium text-gray-900">Token Balance</h3>
         <div className="flex gap-2">
@@ -60,6 +70,7 @@ export const BalanceCard = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

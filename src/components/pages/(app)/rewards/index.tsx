@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Gift, BarChart3, Star, Plus } from 'lucide-react';
+import { Gift, Star } from 'lucide-react';
 import { RewardHistory } from './RewardHistory';
-import { RewardStats } from './RewardStats';
 import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
 
@@ -43,14 +42,12 @@ interface RewardsProps {
   userStats?: UserStats;
 }
 
-type ActiveTab = 'rewards' | 'stats';
 
 export const Rewards: React.FC<RewardsProps> = ({
   onRewardClick,
   rewards = [],
   userStats
 }) => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('rewards');
 
   const defaultStats: UserStats = {
     totalPoints: 3450,
@@ -67,26 +64,6 @@ export const Rewards: React.FC<RewardsProps> = ({
 
   const handleRewardClick = (reward: RewardData) => {
     onRewardClick?.(reward);
-  };
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'rewards':
-        return (
-          <RewardHistory 
-            rewards={rewards}
-            onRewardClick={handleRewardClick}
-          />
-        );
-      
-      case 'stats':
-        return (
-          <RewardStats stats={displayStats} />
-        );
-      
-      default:
-        return null;
-    }
   };
 
   const earnedCount = rewards.filter(r => r.isUnlocked).length;
@@ -141,33 +118,7 @@ export const Rewards: React.FC<RewardsProps> = ({
             <div className="absolute inset-0 bg-white/70"></div>
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  {activeTab === 'rewards' ? 'Your Rewards' : 'Statistics'}
-                </h2>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setActiveTab('rewards')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      activeTab === 'rewards'
-                        ? 'bg-black text-white'
-                        : 'bg-white/50 text-gray-700 hover:bg-white/70'
-                    }`}
-                  >
-                    <Gift className="w-4 h-4 inline mr-2" />
-                    Rewards
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('stats')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      activeTab === 'stats'
-                        ? 'bg-black text-white'
-                        : 'bg-white/50 text-gray-700 hover:bg-white/70'
-                    }`}
-                  >
-                    <BarChart3 className="w-4 h-4 inline mr-2" />
-                    Statistics
-                  </button>
-                </div>
+                <h2 className="text-2xl font-semibold text-gray-900">Your Rewards</h2>
               </div>
 
               <div className="flex items-center gap-6 bg-white/50 backdrop-blur-sm rounded-2xl px-6 py-4 mb-8 border border-white/30">
@@ -188,7 +139,10 @@ export const Rewards: React.FC<RewardsProps> = ({
                 </div>
               </div>
 
-              {renderContent()}
+              <RewardHistory 
+                rewards={rewards}
+                onRewardClick={handleRewardClick}
+              />
             </div>
           </div>
         </div>

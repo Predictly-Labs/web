@@ -28,7 +28,17 @@ export const GroupCard = () => {
   ];
 
   return (
-    <div className="bg-white rounded-3xl p-4 sm:p-6 border border-gray-50 w-full h-auto min-h-[300px] sm:min-h-[400px]">
+    <div 
+      className="rounded-3xl p-4 sm:p-6 w-full h-auto min-h-[300px] sm:min-h-[400px] relative overflow-hidden"
+      style={{
+        backgroundImage: "url('/assets/main/background/bg-nav.jpeg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="absolute inset-0 bg-white/70"></div>
+      <div className="relative z-10">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-lg font-medium text-gray-900">My Groups</h3>
       </div>
@@ -72,6 +82,7 @@ export const GroupCard = () => {
             <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd"/>
           </svg>
         </button>
+      </div>
       </div>
     </div>
   );

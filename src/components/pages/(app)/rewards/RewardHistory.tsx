@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Star, Gift, Calendar, CheckCircle, Lock } from 'lucide-react';
+import { Star, Gift, Lock, Trophy } from 'lucide-react';
 import { RewardCard } from './RewardCard';
 
 interface RewardData {
@@ -153,7 +153,7 @@ export const RewardHistory: React.FC<RewardHistoryProps> = ({
       {unlockedRewards.length > 0 && (
         <section>
           <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-black" />
+            <Trophy className="w-5 h-5 text-yellow-500" />
             Earned Rewards ({unlockedRewards.length})
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

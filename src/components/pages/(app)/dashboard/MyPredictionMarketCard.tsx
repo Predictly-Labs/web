@@ -46,7 +46,17 @@ export const MyPredictionMarketCard = () => {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-4 sm:p-6 border border-gray-50 w-153 h-auto min-h-[300px] sm:min-h-[400px]">
+    <div 
+      className="rounded-3xl p-4 sm:p-6 w-153 h-auto min-h-[300px] sm:min-h-[400px] relative overflow-hidden"
+      style={{
+        backgroundImage: "url('/assets/main/background/bg-nav.jpeg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="absolute inset-0 bg-white/70"></div>
+      <div className="relative z-10">
       <div className="flex items-center justify-between mb-[-4]">
         <h3 className="text-lg font-medium text-gray-900 mb-4">My Predictions</h3>
       </div>
@@ -101,6 +111,7 @@ export const MyPredictionMarketCard = () => {
             <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
           </svg>
         </button>
+      </div>
       </div>
     </div>
   );
