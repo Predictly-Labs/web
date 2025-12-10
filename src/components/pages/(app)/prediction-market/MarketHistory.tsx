@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Calendar, Users, TrendingUp, Clock, DollarSign } from 'lucide-react';
+import { Calendar, Users, TrendingUp, Clock, DollarSign, Plus } from 'lucide-react';
 import Image from 'next/image';
 
 interface MarketData {
@@ -32,6 +32,7 @@ interface MarketCardProps {
 interface MarketHistoryProps {
   markets?: MarketData[];
   onMarketClick?: (market: MarketData) => void;
+  onCreateMarket?: () => void;
 }
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
@@ -113,7 +114,8 @@ const MarketCard: React.FC<MarketCardProps> = ({ market, onClick }) => (
 
 export const MarketHistory: React.FC<MarketHistoryProps> = ({ 
   markets = [], 
-  onMarketClick 
+  onMarketClick,
+  onCreateMarket
 }) => {
   const defaultMarkets: MarketData[] = [
     {
@@ -171,10 +173,13 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-gray-900">Market History</h2>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <TrendingUp className="w-4 h-4" />
-          <span>{displayMarkets.length} total markets</span>
-        </div>
+        <button
+          onClick={onCreateMarket}
+          className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          Create Prediction Market
+        </button>
       </div>
 
       {activeMarkets.length > 0 && (

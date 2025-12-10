@@ -28,7 +28,7 @@ export const GroupCard = () => {
   ];
 
   return (
-    <div className="bg-white rounded-3xl p-4 sm:p-6 border border-gray-50 w-full h-auto min-h-[300px] sm:min-h-[400px] mb-5">
+    <div className="bg-white rounded-3xl p-4 sm:p-6 border border-gray-50 w-full h-auto min-h-[300px] sm:min-h-[400px]">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-lg font-medium text-gray-900">My Groups</h3>
       </div>

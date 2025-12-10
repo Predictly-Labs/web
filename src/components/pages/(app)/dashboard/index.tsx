@@ -7,6 +7,7 @@ import { MyPredictionMarketCard } from "./MyPredictionMarketCard";
 import { DefiCard } from "./DeFiCard";
 import { GroupCard } from "./GroupCard";
 import Sidebar from "../../../ui/Sidebar";
+import Image from "next/image";
 
 export const Dashboard = () => {
   return (
@@ -25,15 +26,36 @@ export const Dashboard = () => {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">My Dashboard</h1>
-            <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-3">Welcome back! Here's what's happening with your predictions.</p>
-            <div className="border-b border-gray-200"></div>
+          <div className="relative mb-6">
+            <div 
+              className="relative overflow-hidden rounded-2xl"
+              style={{
+                backgroundImage: "url('/assets/main/background/bg-flower.png')",
+                backgroundRepeat: "no-repeat",
+              }}
+            >
+              {/* <div className="absolute inset-0 bg-black/10"></div> */}
+              <div className="relative z-10 flex items-center  justify-center gap-4 p-2">
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  <div className="flex items-center gap-1 mb-1">
+                    <h1 className="text-2xl font-medium text-pink-900">My Dashboard</h1>
+                    <Image
+                      src="/assets/landing/cards/no-loss.png"
+                      alt="Dashboard Icon"
+                      width={40}
+                      height={40}
+                      className="object-contain"
+                    />
+                  </div>
+                  <p className="text-sm sm:text-base lg:text-lg text-gray-500 text-center">Welcome back! Here's what's happening with your predictions.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div 
-          className="grid grid-cols-1 lg:grid-cols-4 gap-3 rounded-4xl p-5 bg-white/50 relative overflow-hidden"
+          className="grid grid-cols-1 lg:grid-cols-4 gap-3 rounded-4xl p-3   bg-white/50 relative overflow-hidden"
           style={{
             backgroundImage: "url('/assets/main/background/bg-main.png')",
             backgroundSize: "cover",

@@ -79,15 +79,6 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
               </p>
             </div>
             
-            {!showCreateForm && (
-              <button
-                onClick={handleCreateClick}
-                className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-800 transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-                Create Prediction Market
-              </button>
-            )}
           </div>
           <div className="border-b border-gray-200"></div>
         </div>
@@ -118,6 +109,7 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
             <MarketHistory 
               markets={markets}
               onMarketClick={handleMarketClick}
+              onCreateMarket={handleCreateClick}
             />
           )}
         </div>
