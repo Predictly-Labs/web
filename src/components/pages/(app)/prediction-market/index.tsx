@@ -65,7 +65,7 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
   return (
     <div className="p-3 sm:p-6 min-h-screen relative bg-[#f7f5fa]">
       <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
-      <Sidebar />
+      {!showOnboarding && <Sidebar />}
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-4">

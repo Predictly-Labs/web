@@ -17,9 +17,10 @@ interface MarketFormData {
 }
 
 interface GroupSelection {
-  type: 'create' | 'select';
+  type: 'create' | 'select' | 'invite';
   groupId?: string;
   groupName?: string;
+  inviteCode?: string;
 }
 
 interface CreateMarketOnboardingProps {
@@ -49,7 +50,7 @@ export const CreateMarketOnboarding: React.FC<CreateMarketOnboardingProps> = ({
     const selectedGroup = existingGroups.find(g => g.id === selection.groupId);
     setGroupSelection({
       ...selection,
-      groupName: selectedGroup?.name
+      groupName: selectedGroup?.name || (selection.type === 'invite' ? `Invite Code: ${selection.inviteCode}` : undefined)
     });
     setCurrentStep('risk');
   };
@@ -127,7 +128,7 @@ export const CreateMarketOnboarding: React.FC<CreateMarketOnboardingProps> = ({
         <CreateMarketForm
           onSubmit={handleFormSubmit}
           onBack={handleBack}
-          groupType={groupSelection?.type}
+          groupType={groupSelection?.type === 'invite' ? undefined : groupSelection?.type}
           groupName={groupSelection?.groupName}
           riskType={riskType || undefined}
         />

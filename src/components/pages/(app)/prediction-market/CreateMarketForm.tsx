@@ -218,7 +218,7 @@ export const CreateMarketForm: React.FC<CreateMarketFormProps> = ({
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -227,7 +227,7 @@ export const CreateMarketForm: React.FC<CreateMarketFormProps> = ({
         
         <button
           type="submit"
-          className={`bg-black text-white py-4 px-8 rounded-xl font-medium hover:bg-gray-800 transition-colors ${
+          className={`bg-black text-white py-4 px-8 rounded-xl font-medium hover:bg-gray-800 transition-colors cursor-pointer ${
             onBack ? 'ml-auto' : 'w-full'
           }`}
         >

@@ -372,7 +372,7 @@ export const Groups: React.FC<GroupsProps> = ({
                     <div className="bg-white rounded-full p-1">
                       <Plus className="w-2 h-2 text-black" />
                     </div>
-                    Create Your Groups
+                    Create New Groups
                   </button>
                 </div>
                 

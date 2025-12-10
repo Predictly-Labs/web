@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Shield, AlertTriangle, ArrowRight, ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+import Lottie from 'lottie-react';
+import Image from 'next/image';
+import fullDegenAnimation from '../../../../../public/assets/main/animation/full-degen-animation.json';
+import noRiskAnimation from '../../../../../public/assets/main/animation/no-risk-animation.json';
 
 export type RiskType = 'full' | 'zero';
 
@@ -23,132 +28,165 @@ export const RiskSelectionStep: React.FC<RiskSelectionStepProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
           Choose Your Risk Level
         </h3>
         <p className="text-gray-600">
-          Select the risk level for your prediction market participants.
+          Select the trading mode for your prediction market.
         </p>
       </div>
 
-      <div className="space-y-4">
-        {/* Full Risk Option */}
-        <div
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div
           onClick={() => setSelectedRisk('full')}
-          className={`p-6 rounded-2xl border-2 cursor-pointer transition-all ${
+          className={`relative p-8 rounded-3xl cursor-pointer transition-all overflow-hidden ${
             selectedRisk === 'full'
-              ? 'border-red-500 bg-red-50'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'bg-gradient-to-br from-orange-500 to-red-600 text-white border-4 border-yellow-400'
+              : 'bg-white border-2 border-gray-200 hover:border-yellow-300 hover:shadow-lg'
           }`}
+          whileHover={{ scale: 1.03, y: -5 }}
+          whileTap={{ scale: 0.98 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
-              <AlertTriangle className="w-6 h-6 text-white" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+                selectedRisk === 'full' ? '' : ''
+              }`}>
+                <Lottie 
+                  animationData={fullDegenAnimation} 
+                  loop={true} 
+                  className="w-12 h-12"
+                />
+              </div>
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                selectedRisk === 'full'
+                  ? 'border-white bg-white'
+                  : 'border-gray-300'
+              }`}>
+                {selectedRisk === 'full' && (
+                  <div className="w-3 h-3 bg-red-500 rounded-full" />
+                )}
+              </div>
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h4 className="text-lg font-semibold text-gray-900">
-                  Full Risk
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className={`text-2xl font-bold mb-2 ${
+                  selectedRisk === 'full' ? 'text-white' : 'text-gray-900'
+                }`}>
+                  Degen Mode
                 </h4>
-                <div className="flex items-center gap-1 text-red-600 text-sm">
-                  <TrendingDown className="w-4 h-4" />
-                  <span className="font-medium">High Risk</span>
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm mb-3">
-                Participants can lose both their principal (invested money) and yield from DeFi protocols.
-              </p>
-              <div className="bg-red-100 border border-red-200 rounded-lg p-3">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-medium text-red-800 mb-1">Risk Warning:</p>
-                    <p className="text-red-700">
-                      Participants can lose up to 100% of their invested money plus any yield earned.
-                    </p>
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${
+                  selectedRisk === 'full' 
+                    ? 'bg-white/20 text-white' 
+                    : 'text-yellow-700 border-yellow-500 border'
+                }`}>
+                  <div className="flex items-center -space-x-1">
+                    <Image src="/assets/logo/defi-protocol-logo/Canopy.jpg" alt="Canopy" width={16} height={16} className="rounded-full" />
+                    <Image src="/assets/logo/defi-protocol-logo/Layer Bank.jpg" alt="Layer Bank" width={16} height={16} className="rounded-full" />
+                    <Image src="/assets/logo/defi-protocol-logo/MovePosition.jpg" alt="MovePosition" width={16} height={16} className="rounded-full" />
                   </div>
+                  Principal + yield from DeFi
                 </div>
               </div>
-              <div className="mt-3 text-sm text-gray-600">
-                <p>• Higher potential returns</p>
-                <p>• Maximum risk exposure</p>
-                <p>• Suitable for experienced traders</p>
-              </div>
-            </div>
-            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-              selectedRisk === 'full'
-                ? 'border-red-500 bg-red-500'
-                : 'border-gray-300'
-            }`}>
-              {selectedRisk === 'full' && (
-                <div className="w-2 h-2 bg-white rounded-full" />
-              )}
+              
+              <p className={`text-sm leading-relaxed ${
+                selectedRisk === 'full' ? 'text-white/90' : 'text-gray-600'
+              }`}>
+                Maximum risk, maximum reward. Your principal and DeFi yield are both at stake.
+              </p>
             </div>
           </div>
-        </div>
+          
+          {selectedRisk === 'full' && (
+            <div className="absolute inset-0 bg-yellow-500 to-white/10" />
+          )}
+        </motion.div>
 
-        {/* Zero Risk Option */}
-        <div
+        <motion.div
           onClick={() => setSelectedRisk('zero')}
-          className={`p-6 rounded-2xl border-2 cursor-pointer transition-all ${
+          className={`relative p-8 rounded-3xl cursor-pointer transition-all overflow-hidden ${
             selectedRisk === 'zero'
-              ? 'border-green-500 bg-green-50'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white border-4 border-green-400'
+              : 'bg-white border-2 border-gray-200 hover:border-green-300 hover:shadow-lg'
           }`}
+          whileHover={{ scale: 1.03, y: -5 }}
+          whileTap={{ scale: 0.98 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
         >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+                selectedRisk === 'zero' ? '' : ''
+              }`}>
+                <Lottie 
+                  animationData={noRiskAnimation} 
+                  loop={true} 
+                  className="w-12 h-12"
+                />
+              </div>
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                selectedRisk === 'zero'
+                  ? 'border-white bg-white'
+                  : 'border-gray-300'
+              }`}>
+                {selectedRisk === 'zero' && (
+                  <div className="w-3 h-3 bg-green-500 rounded-full" />
+                )}
+              </div>
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h4 className="text-lg font-semibold text-gray-900">
-                  Zero Risk (Principal Protected)
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className={`text-2xl font-bold mb-2 ${
+                  selectedRisk === 'zero' ? 'text-white' : 'text-gray-900'
+                }`}>
+                  Zero Risk Mode
                 </h4>
-                <div className="flex items-center gap-1 text-green-600 text-sm">
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="font-medium">Low Risk</span>
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm mb-3">
-                Participants only risk the yield from DeFi protocols, their principal (invested money) is protected.
-              </p>
-              <div className="bg-green-100 border border-green-200 rounded-lg p-3">
-                <div className="flex items-start gap-2">
-                  <Shield className="w-4 h-4 text-green-600 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-medium text-green-800 mb-1">Principal Protection:</p>
-                    <p className="text-green-700">
-                      Your invested money (principal) is safe. Only DeFi yield earnings are at risk.
-                    </p>
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${
+                  selectedRisk === 'zero' 
+                    ? 'bg-white/20 text-white' 
+                    : 'text-green-700 border border-green-600'
+                }`}>
+                  <div className="flex items-center -space-x-1">
+                    <Image src="/assets/logo/defi-protocol-logo/Canopy.jpg" alt="Canopy" width={16} height={16} className="rounded-full" />
+                    <Image src="/assets/logo/defi-protocol-logo/Layer Bank.jpg" alt="Layer Bank" width={16} height={16} className="rounded-full" />
+                    <Image src="/assets/logo/defi-protocol-logo/MovePosition.jpg" alt="MovePosition" width={16} height={16} className="rounded-full" />
                   </div>
+                  Only yield from DeFi
                 </div>
               </div>
-              <div className="mt-3 text-sm text-gray-600">
-                <p>• Principal investment protected</p>
-                <p>• Only yield earnings at risk</p>
-                <p>• Perfect for conservative investors</p>
-              </div>
-            </div>
-            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-              selectedRisk === 'zero'
-                ? 'border-green-500 bg-green-500'
-                : 'border-gray-300'
-            }`}>
-              {selectedRisk === 'zero' && (
-                <div className="w-2 h-2 bg-white rounded-full" />
-              )}
+              
+              <p className={`text-sm leading-relaxed ${
+                selectedRisk === 'zero' ? 'text-white/90' : 'text-gray-600'
+              }`}>
+                Your principal is safe. Only DeFi yield earnings are at risk for maximum security.
+              </p>
             </div>
           </div>
-        </div>
+          
+          {selectedRisk === 'zero' && (
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/10" />
+          )}
+        </motion.div>
       </div>
 
-      <div className="flex items-center justify-between pt-4">
+      <motion.div 
+        className="flex items-center justify-between pt-4"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.4 }}
+      >
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
@@ -157,16 +195,16 @@ export const RiskSelectionStep: React.FC<RiskSelectionStepProps> = ({
         <button
           onClick={handleNext}
           disabled={!selectedRisk}
-          className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+          className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold transition-all cursor-pointer ${
             selectedRisk
-              ? 'bg-black text-white hover:bg-gray-800'
+              ? 'bg-black text-white hover:bg-gray-800 shadow-lg'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
           }`}
         >
           Continue
           <ArrowRight className="w-4 h-4" />
         </button>
-      </div>
+      </motion.div>
     </div>
   );
 };
