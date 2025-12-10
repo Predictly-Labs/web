@@ -7,7 +7,7 @@ export const MyPredictionMarketCard = () => {
     {
       id: 1,
       title: "ETH will reach $4000 by December",
-      status: "active",
+      status: "Active",
       participants: 5,
       pool: 250,
       myBet: 50,
@@ -17,7 +17,7 @@ export const MyPredictionMarketCard = () => {
     {
       id: 2,
       title: "BTC dominance below 50%",
-      status: "closed",
+      status: "Closed",
       participants: 8,
       pool: 420,
       myBet: 30,
@@ -27,7 +27,7 @@ export const MyPredictionMarketCard = () => {
     {
       id: 3,
       title: "MOVE token $10 EOY",
-      status: "pending",
+      status: "Pending",
       participants: 3,
       pool: 180,
       myBet: 60,
@@ -38,9 +38,9 @@ export const MyPredictionMarketCard = () => {
 
   const getStatusColor = (status: string) => {
     switch(status) {
-      case 'active': return 'bg-green-100 text-green-700';
-      case 'closed': return 'bg-gray-100 text-gray-700';
-      case 'pending': return 'bg-yellow-100 text-yellow-700';
+      case 'Active': return 'bg-green-600 text-white';
+      case 'Closed': return 'bg-gray-600 text-white';
+      case 'Pending': return 'bg-yellow-500 text-white';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
