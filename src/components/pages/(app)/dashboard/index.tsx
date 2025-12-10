@@ -56,12 +56,12 @@ export const Dashboard = () => {
 
         <div 
           className="grid grid-cols-1 lg:grid-cols-4 gap-3 rounded-4xl p-3   bg-white/50 relative overflow-hidden"
-          style={{
-            backgroundImage: "url('/assets/main/background/bg-main.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
+          // style={{
+          //   backgroundImage: "url('/assets/main/background/bg-main.png')",
+          //   backgroundSize: "cover",
+          //   backgroundPosition: "center",
+          //   backgroundRepeat: "no-repeat",
+          // }}
         >
           <div className="lg:col-span-1 flex flex-col h-full">
             <PredictionCard />
