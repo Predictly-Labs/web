@@ -116,11 +116,10 @@ export const RewardCard: React.FC<RewardCardProps> = ({ reward, onClick }) => {
     <div 
       onClick={handleClick}
       className={`
-        relative overflow-hidden rounded-2xl border-2 p-6 transition-all duration-300 cursor-pointer
-        ${rarityConfig.bg} ${rarityConfig.glow}
+        relative overflow-hidden rounded-2xl border p-4 transition-all duration-300 cursor-pointer bg-white hover:shadow-lg
         ${reward.isUnlocked 
-          ? 'hover:scale-105 hover:shadow-lg' 
-          : 'opacity-75 hover:opacity-90'
+          ? 'border-gray-200' 
+          : 'border-gray-100 opacity-75'
         }
       `}
     >
@@ -130,31 +129,28 @@ export const RewardCard: React.FC<RewardCardProps> = ({ reward, onClick }) => {
         </div>
       )}
 
-      <div className="flex items-start gap-4 mb-4">
-        <div className={`
-          w-16 h-16 rounded-2xl flex items-center justify-center
-          ${reward.isUnlocked ? rarityConfig.bg : 'bg-gray-200'}
-        `}>
+      <div className="flex items-start gap-3 mb-4">
+        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
           <Image
             src={reward.icon}
             alt={reward.title}
-            width={40}
-            height={40}
-            className={`object-cover ${reward.isUnlocked ? '' : 'grayscale'}`}
+            width={32}
+            height={32}
+            className={`object-cover rounded ${reward.isUnlocked ? '' : 'grayscale'}`}
           />
         </div>
 
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-1">
             <h3 className={`font-semibold ${reward.isUnlocked ? 'text-gray-900' : 'text-gray-600'}`}>
               {reward.title}
             </h3>
-            <span className={`px-2 py-1 rounded-full text-xs font-medium uppercase ${rarityConfig.badge}`}>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium uppercase bg-gray-100 text-gray-600">
               {reward.rarity}
             </span>
           </div>
           
-          <p className={`text-sm mb-3 ${reward.isUnlocked ? 'text-gray-600' : 'text-gray-500'}`}>
+          <p className={`text-sm ${reward.isUnlocked ? 'text-gray-600' : 'text-gray-500'}`}>
             {reward.description}
           </p>
         </div>

@@ -28,24 +28,6 @@ interface RewardHistoryProps {
   onRewardClick?: (reward: RewardData) => void;
 }
 
-interface SectionHeaderProps {
-  title: string;
-  count: number;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-}
-
-const SectionHeader: React.FC<SectionHeaderProps> = ({ title, count, icon: Icon, color }) => (
-  <div className="flex items-center gap-3 mb-6">
-    <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center`}>
-      <Icon className="w-5 h-5 text-white" />
-    </div>
-    <div>
-      <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
-      <p className="text-sm text-gray-600">{count} rewards</p>
-    </div>
-  </div>
-);
 
 export const RewardHistory: React.FC<RewardHistoryProps> = ({ 
   rewards = [], 
@@ -167,15 +149,13 @@ export const RewardHistory: React.FC<RewardHistoryProps> = ({
   };
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       {unlockedRewards.length > 0 && (
         <section>
-          <SectionHeader
-            title="Earned Rewards"
-            count={unlockedRewards.length}
-            icon={CheckCircle}
-            color="bg-green-500"
-          />
+          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-black" />
+            Earned Rewards ({unlockedRewards.length})
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {unlockedRewards.map(reward => (
               <RewardCard 
@@ -190,12 +170,10 @@ export const RewardHistory: React.FC<RewardHistoryProps> = ({
 
       {availableRewards.length > 0 && (
         <section>
-          <SectionHeader
-            title="In Progress"
-            count={availableRewards.length}
-            icon={Star}
-            color="bg-blue-500"
-          />
+          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+            <Star className="w-5 h-5 text-black" />
+            In Progress ({availableRewards.length})
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {availableRewards.map(reward => (
               <RewardCard 
@@ -210,12 +188,10 @@ export const RewardHistory: React.FC<RewardHistoryProps> = ({
 
       {lockedRewards.length > 0 && (
         <section>
-          <SectionHeader
-            title="Locked Rewards"
-            count={lockedRewards.length}
-            icon={Lock}
-            color="bg-gray-500"
-          />
+          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+            <Lock className="w-5 h-5 text-gray-500" />
+            Locked Rewards ({lockedRewards.length})
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {lockedRewards.map(reward => (
               <RewardCard 

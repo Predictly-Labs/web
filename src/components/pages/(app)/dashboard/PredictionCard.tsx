@@ -1,5 +1,7 @@
 "use client";
 
+import Image from 'next/image';
+
 export const PredictionCard = () => {
   return (
     <div
@@ -15,9 +17,18 @@ export const PredictionCard = () => {
 
       <div className="relative z-10 flex flex-col h-179">
         <div className="flex items-start justify-between mb-8">
-          <h3 className="text-xl font-medium text-black/80">
-            Let's create your Prediction Market with your friends!
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xl font-medium text-black/80">
+              Built on 
+            </h3>
+            <Image
+              src="/assets/logo/movement-logo.png"
+              alt="Movement Logo"
+              width={120}
+              height={30}
+              className="object-contain"
+            />
+          </div>
         </div>
 
         <div className="flex-1 flex items-center justify-center mb-12"></div>

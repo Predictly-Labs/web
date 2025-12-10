@@ -179,7 +179,103 @@ export const Groups: React.FC<GroupsProps> = ({
           createdAt: '2024-08-15'
         }
       ]
-    }
+    },
+    {
+      id: '4',
+      name: 'DeFi Degens',
+      description: 'High-risk, high-reward DeFi predictions and yield farming strategies.',
+      avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg',
+      memberCount: 15,
+      activeMarkets: 5,
+      totalVolume: 8300,
+      owner: 'John Doe',
+      members: [
+        { id: '1', name: 'John Doe', avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg', isOwner: true },
+        { id: '2', name: 'Emma Davis', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg' },
+        { id: '3', name: 'Ryan Miller', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' }
+      ],
+      createdAt: '2024-10-20',
+      isPrivate: true,
+      markets: [
+        {
+          id: '3',
+          title: 'New DeFi protocol will reach $1B TVL in Q1 2025?',
+          description: 'Will any new DeFi protocol launched in 2024 reach $1 billion total value locked by March 2025?',
+          endDate: '2025-03-31',
+          totalPool: 3200,
+          participants: 14,
+          status: 'active',
+          category: 'DeFi',
+          currentOdds: 28,
+          createdBy: 'John Doe',
+          createdAt: '2024-11-20'
+        }
+      ]
+    },
+    {
+      id: '5',
+      name: 'DeFi Degens',
+      description: 'High-risk, high-reward DeFi predictions and yield farming strategies.',
+      avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg',
+      memberCount: 15,
+      activeMarkets: 5,
+      totalVolume: 8300,
+      owner: 'John Doe',
+      members: [
+        { id: '1', name: 'John Doe', avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg', isOwner: true },
+        { id: '2', name: 'Emma Davis', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg' },
+        { id: '3', name: 'Ryan Miller', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' }
+      ],
+      createdAt: '2024-10-20',
+      isPrivate: true,
+      markets: [
+        {
+          id: '3',
+          title: 'New DeFi protocol will reach $1B TVL in Q1 2025?',
+          description: 'Will any new DeFi protocol launched in 2024 reach $1 billion total value locked by March 2025?',
+          endDate: '2025-03-31',
+          totalPool: 3200,
+          participants: 14,
+          status: 'active',
+          category: 'DeFi',
+          currentOdds: 28,
+          createdBy: 'John Doe',
+          createdAt: '2024-11-20'
+        }
+      ]
+    },
+    {
+      id: '6',
+      name: 'DeFi Degens',
+      description: 'High-risk, high-reward DeFi predictions and yield farming strategies.',
+      avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg',
+      memberCount: 15,
+      activeMarkets: 5,
+      totalVolume: 8300,
+      owner: 'John Doe',
+      members: [
+        { id: '1', name: 'John Doe', avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg', isOwner: true },
+        { id: '2', name: 'Emma Davis', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg' },
+        { id: '3', name: 'Ryan Miller', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' }
+      ],
+      createdAt: '2024-10-20',
+      isPrivate: true,
+      markets: [
+        {
+          id: '3',
+          title: 'New DeFi protocol will reach $1B TVL in Q1 2025?',
+          description: 'Will any new DeFi protocol launched in 2024 reach $1 billion total value locked by March 2025?',
+          endDate: '2025-03-31',
+          totalPool: 3200,
+          participants: 14,
+          status: 'active',
+          category: 'DeFi',
+          currentOdds: 28,
+          createdBy: 'John Doe',
+          createdAt: '2024-11-20'
+        }
+      ]
+    },
   ];
 
   const displayGroups = groups.length > 0 ? groups : defaultGroups;
@@ -224,15 +320,15 @@ export const Groups: React.FC<GroupsProps> = ({
                         <ArrowLeft className="w-6 h-6 text-pink-900" />
                       </button>
                     )}
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       <h1 className="text-2xl font-medium text-pink-900">
                         {selectedGroup ? selectedGroup.name : 'Groups'}
                       </h1>
                       <Image
-                        src="/assets/landing/cards/no-loss.png"
+                        src="/assets/main/icon/groups-icon.png"
                         alt="Groups Icon"
-                        width={40}
-                        height={40}
+                        width={30}
+                        height={30}
                         className="object-contain"
                       />
                     </div>

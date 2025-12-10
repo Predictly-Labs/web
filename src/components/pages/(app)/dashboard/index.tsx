@@ -37,13 +37,13 @@ export const Dashboard = () => {
               {/* <div className="absolute inset-0 bg-black/10"></div> */}
               <div className="relative z-10 flex items-center  justify-center gap-4 p-2">
                 <div className="flex-1 flex flex-col items-center justify-center">
-                  <div className="flex items-center gap-1 mb-1">
+                  <div className="flex items-center gap-2 mb-1">
                     <h1 className="text-2xl font-medium text-pink-900">My Dashboard</h1>
                     <Image
-                      src="/assets/landing/cards/no-loss.png"
+                      src="/assets/main/icon/dashboard-icon.png"
                       alt="Dashboard Icon"
-                      width={40}
-                      height={40}
+                      width={30}
+                      height={30}
                       className="object-contain"
                     />
                   </div>

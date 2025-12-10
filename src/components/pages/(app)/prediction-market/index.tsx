@@ -80,13 +80,13 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
             >
               <div className="relative z-10 flex items-center justify-center gap-4 p-2">
                 <div className="flex-1 flex flex-col items-center justify-center">
-                  <div className="flex items-center gap-1 mb-1">
+                  <div className="flex items-center gap-2 mb-1">
                     <h1 className="text-2xl font-medium text-pink-900">Prediction Markets</h1>
                     <Image
-                      src="/assets/landing/cards/no-loss.png"
+                      src="/assets/main/icon/prediction-market-icon.png"
                       alt="Prediction Markets Icon"
-                      width={40}
-                      height={40}
+                      width={25}
+                      height={30}
                       className="object-contain"
                     />
                   </div>
