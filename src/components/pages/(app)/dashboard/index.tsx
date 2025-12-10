@@ -47,7 +47,7 @@ export const Dashboard = () => {
                       className="object-contain"
                     />
                   </div>
-                  <p className="text-sm sm:text-base lg:text-lg text-gray-500 text-center">Welcome back! Here's what's happening with your predictions.</p>
+                  <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center">Welcome back! Here's what's happening with your predictions.</p>
                 </div>
               </div>
             </div>

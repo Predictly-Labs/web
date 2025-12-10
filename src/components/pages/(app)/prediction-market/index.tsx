@@ -5,6 +5,7 @@ import { Plus, TrendingUp } from 'lucide-react';
 import { CreateMarketForm } from './CreateMarketForm';
 import { MarketHistory } from './MarketHistory';
 import Sidebar from "../../../ui/Sidebar";
+import Image from "next/image";
 
 interface MarketFormData {
   title: string;
@@ -68,19 +69,32 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
       <Sidebar />
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="mb-8">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">
-                Prediction Markets
-              </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-3">
-                Create and manage your prediction markets with friends and groups.
-              </p>
+        <div className="mb-4">
+          <div className="relative mb-6">
+            <div 
+              className="relative overflow-hidden rounded-2xl"
+              style={{
+                backgroundImage: "url('/assets/main/background/bg-flower.png')",
+                backgroundRepeat: "no-repeat",
+              }}
+            >
+              <div className="relative z-10 flex items-center justify-center gap-4 p-2">
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  <div className="flex items-center gap-1 mb-1">
+                    <h1 className="text-2xl font-medium text-pink-900">Prediction Markets</h1>
+                    <Image
+                      src="/assets/landing/cards/no-loss.png"
+                      alt="Prediction Markets Icon"
+                      width={40}
+                      height={40}
+                      className="object-contain"
+                    />
+                  </div>
+                  <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center">Create and manage your prediction markets with friends and groups.</p>
+                </div>
+              </div>
             </div>
-            
           </div>
-          <div className="border-b border-gray-200"></div>
         </div>
 
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-100">
