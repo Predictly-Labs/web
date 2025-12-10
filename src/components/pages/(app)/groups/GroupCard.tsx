@@ -23,6 +23,7 @@ interface GroupData {
   members: GroupMember[];
   createdAt: string;
   isPrivate: boolean;
+  markets?: any[];
 }
 
 interface GroupCardProps {

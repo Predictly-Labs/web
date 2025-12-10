@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, Users, ArrowLeft } from 'lucide-react';
+import { Users, ArrowLeft } from 'lucide-react';
 import { GroupCard } from './GroupCard';
 import { GroupMarkets } from './GroupMarkets';
 import Sidebar from "../../../ui/Sidebar";
+import Image from "next/image";
 
 interface GroupMember {
   id: string;
@@ -45,14 +46,12 @@ interface GroupData {
 interface GroupsProps {
   onGroupClick?: (group: GroupData) => void;
   onMarketClick?: (market: MarketData) => void;
-  onCreateGroup?: () => void;
   groups?: GroupData[];
 }
 
 export const Groups: React.FC<GroupsProps> = ({
   onGroupClick,
   onMarketClick,
-  onCreateGroup,
   groups = []
 }) => {
   const [selectedGroup, setSelectedGroup] = useState<GroupData | null>(null);
@@ -198,9 +197,6 @@ export const Groups: React.FC<GroupsProps> = ({
     setSelectedGroup(null);
   };
 
-  const handleCreateGroup = () => {
-    onCreateGroup?.();
-  };
 
   return (
     <div className="p-3 sm:p-6 min-h-screen relative bg-[#f7f5fa]">
@@ -208,41 +204,49 @@ export const Groups: React.FC<GroupsProps> = ({
       <Sidebar />
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="mb-8">
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {selectedGroup && (
-                <button
-                  onClick={handleBackToGroups}
-                  className="p-2 hover:bg-white/20 rounded-xl transition-colors"
-                >
-                  <ArrowLeft className="w-6 h-6 text-gray-600" />
-                </button>
-              )}
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-medium text-gray-900 mb-2">
-                  {selectedGroup ? selectedGroup.name : 'Groups'}
-                </h1>
-                <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-3">
-                  {selectedGroup 
-                    ? 'View and manage prediction markets created by this group.'
-                    : 'Join groups and participate in their prediction markets.'
-                  }
-                </p>
+        <div className="mb-4">
+          <div className="relative mb-6">
+            <div 
+              className="relative overflow-hidden rounded-2xl"
+              style={{
+                backgroundImage: "url('/assets/main/background/bg-flower.png')",
+                backgroundRepeat: "no-repeat",
+              }}
+            >
+              <div className="relative z-10 flex items-center justify-center gap-4 p-2">
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  <div className="flex items-center gap-4">
+                    {selectedGroup && (
+                      <button
+                        onClick={handleBackToGroups}
+                        className="p-2 hover:bg-white/20 rounded-xl transition-colors"
+                      >
+                        <ArrowLeft className="w-6 h-6 text-pink-900" />
+                      </button>
+                    )}
+                    <div className="flex items-center gap-1">
+                      <h1 className="text-2xl font-medium text-pink-900">
+                        {selectedGroup ? selectedGroup.name : 'Groups'}
+                      </h1>
+                      <Image
+                        src="/assets/landing/cards/no-loss.png"
+                        alt="Groups Icon"
+                        width={40}
+                        height={40}
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center mt-1">
+                    {selectedGroup 
+                      ? 'View and manage prediction markets created by this group.'
+                      : 'Join groups and participate in their prediction markets.'
+                    }
+                  </p>
+                </div>
               </div>
             </div>
-            
-            {!selectedGroup && (
-              <button
-                onClick={handleCreateGroup}
-                className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-800 transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-                Create Group
-              </button>
-            )}
           </div>
-          <div className="border-b border-gray-200"></div>
         </div>
 
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-100">
