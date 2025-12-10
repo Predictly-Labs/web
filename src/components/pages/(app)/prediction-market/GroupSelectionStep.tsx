@@ -109,7 +109,6 @@ export const GroupSelectionStep: React.FC<GroupSelectionStepProps> = ({
       </div>
 
       <div className="space-y-4">
-        {/* Create New Group Option */}
         <motion.div
           onClick={() => handleOptionSelect('create')}
           className={`p-6 rounded-2xl border-2 cursor-pointer transition-all ${

@@ -31,10 +31,10 @@ export const RiskSelectionStep: React.FC<RiskSelectionStepProps> = ({
     <div className="space-y-8">
       <div className="text-center">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          Choose Your Risk Level
+          Choose Your Risk Mode
         </h3>
         <p className="text-gray-600">
-          Select the trading mode for your prediction market.
+          Select the trading mode for your prediction market with your groups friend.
         </p>
       </div>
 
@@ -167,7 +167,7 @@ export const RiskSelectionStep: React.FC<RiskSelectionStepProps> = ({
               <p className={`text-sm leading-relaxed ${
                 selectedRisk === 'zero' ? 'text-white/90' : 'text-gray-600'
               }`}>
-                Your principal is safe. Only DeFi yield earnings are at risk for maximum security.
+                Your principal is safe. Only DeFi yield earnings are at risk for safe mode.
               </p>
             </div>
           </div>
