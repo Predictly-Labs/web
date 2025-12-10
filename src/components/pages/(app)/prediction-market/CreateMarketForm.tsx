@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Calendar, Clock, DollarSign, Users } from 'lucide-react';
+import { Calendar, Clock, DollarSign, Users, ArrowLeft } from 'lucide-react';
 
 interface MarketFormData {
   title: string;
@@ -35,6 +35,10 @@ interface FormSelectProps {
 
 interface CreateMarketFormProps {
   onSubmit?: (data: MarketFormData) => void;
+  onBack?: () => void;
+  groupType?: 'create' | 'select';
+  groupName?: string;
+  riskType?: 'full' | 'zero';
 }
 
 const FormInput: React.FC<FormInputProps> = ({ label, icon: Icon, children }) => (
@@ -72,7 +76,13 @@ const FormSelect: React.FC<FormSelectProps> = ({ value, onChange, options }) => 
   </select>
 );
 
-export const CreateMarketForm: React.FC<CreateMarketFormProps> = ({ onSubmit }) => {
+export const CreateMarketForm: React.FC<CreateMarketFormProps> = ({ 
+  onSubmit, 
+  onBack, 
+  groupType, 
+  groupName, 
+  riskType 
+}) => {
   const [formData, setFormData] = useState<MarketFormData>({
     title: '',
     description: '',
@@ -102,7 +112,32 @@ export const CreateMarketForm: React.FC<CreateMarketFormProps> = ({ onSubmit }) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-6">
+      {(groupType || riskType) && (
+        <div className="bg-gray-50 rounded-2xl p-4 space-y-2">
+          <h4 className="font-medium text-gray-900 mb-3">Your Selections:</h4>
+          <div className="space-y-2 text-sm">
+            {groupType && (
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">Group Option:</span>
+                <span className="font-medium text-gray-900">
+                  {groupType === 'create' ? 'Create New Group' : `Selected: ${groupName || 'Existing Group'}`}
+                </span>
+              </div>
+            )}
+            {riskType && (
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">Risk Level:</span>
+                <span className={`font-medium ${riskType === 'full' ? 'text-red-600' : 'text-green-600'}`}>
+                  {riskType === 'full' ? 'Full Risk' : 'Zero Risk (Principal Protected)'}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
       <FormInput label="Market Title" icon={DollarSign}>
         <FormField
           type="text"
@@ -178,12 +213,28 @@ export const CreateMarketForm: React.FC<CreateMarketFormProps> = ({ onSubmit }) 
         </label>
       </div>
 
-      <button
-        type="submit"
-        className="w-full bg-black text-white py-4 rounded-xl font-medium hover:bg-gray-800 transition-colors"
-      >
-        Create Market
-      </button>
+      <div className="flex items-center justify-between pt-4">
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+        )}
+        
+        <button
+          type="submit"
+          className={`bg-black text-white py-4 px-8 rounded-xl font-medium hover:bg-gray-800 transition-colors ${
+            onBack ? 'ml-auto' : 'w-full'
+          }`}
+        >
+          Create Market
+        </button>
+      </div>
     </form>
+    </div>
   );
 };

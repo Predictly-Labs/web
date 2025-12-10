@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, TrendingUp } from 'lucide-react';
-import { CreateMarketForm } from './CreateMarketForm';
+import { CreateMarketOnboarding } from './CreateMarketOnboarding';
 import { MarketHistory } from './MarketHistory';
 import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
@@ -44,11 +43,11 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
   onMarketClick,
   markets = []
 }) => {
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
-  const handleMarketSubmit = (data: MarketFormData) => {
+  const handleMarketCreated = (data: MarketFormData) => {
     onMarketCreated?.(data);
-    setShowCreateForm(false);
+    setShowOnboarding(false);
   };
 
   const handleMarketClick = (market: MarketData) => {
@@ -56,11 +55,11 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
   };
 
   const handleCreateClick = () => {
-    setShowCreateForm(true);
+    setShowOnboarding(true);
   };
 
-  const handleBackToHistory = () => {
-    setShowCreateForm(false);
+  const handleCloseOnboarding = () => {
+    setShowOnboarding(false);
   };
 
   return (
@@ -97,37 +96,19 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-2 border border-gray-100" 
-        >
-          {showCreateForm ? (
-            <div>
-              <div className="mb-6 flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                    Create New Prediction Market
-                  </h2>
-                  <p className="text-gray-600">
-                    Set up a new prediction market and invite your friends to participate.
-                  </p>
-                </div>
-                <button
-                  onClick={handleBackToHistory}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  <TrendingUp className="w-5 h-5" />
-                  Back to History
-                </button>
-              </div>
-              <CreateMarketForm onSubmit={handleMarketSubmit} />
-            </div>
-          ) : (
-            <MarketHistory 
-              markets={markets}
-              onMarketClick={handleMarketClick}
-              onCreateMarket={handleCreateClick}
-            />
-          )}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-2 border border-gray-100">
+          <MarketHistory 
+            markets={markets}
+            onMarketClick={handleMarketClick}
+            onCreateMarket={handleCreateClick}
+          />
         </div>
+
+        <CreateMarketOnboarding
+          isOpen={showOnboarding}
+          onClose={handleCloseOnboarding}
+          onMarketCreated={handleMarketCreated}
+        />
       </div>
     </div>
   );
