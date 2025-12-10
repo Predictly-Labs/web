@@ -3,7 +3,7 @@
 export const PredictionCard = () => {
   return (
     <div
-      className="rounded-4xl p-6 relative overflow-hidden h-185 w-100"
+      className="rounded-4xl p-4 sm:p-6 relative overflow-hidden h-auto min-h-[300px] w-full sm:min-h-[400px] lg:min-h-[500px]"
       style={{
         backgroundImage: "url('/assets/main/background/move-bg.png')",
         backgroundSize: "cover",
@@ -13,7 +13,7 @@ export const PredictionCard = () => {
     >
       <div className="absolute inset-0"></div>
 
-      <div className="relative z-10 h-full flex flex-col">
+      <div className="relative z-10 flex flex-col h-179">
         <div className="flex items-start justify-between mb-8">
           <h3 className="text-xl font-medium text-black/80">
             Let's create your Prediction Market with your friends!

@@ -28,7 +28,7 @@ export const DefiCard = () => {
   ];
 
   return (
-    <div className="bg-white rounded-3xl p-8 border border-gray-100 w-80 h-80">
+    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-gray-50 w-full h-auto min-h-[280px] sm:min-h-[320px]">
       <h3 className="text-xl font-medium text-black mb-6">
         DeFi Protocol
       </h3>
