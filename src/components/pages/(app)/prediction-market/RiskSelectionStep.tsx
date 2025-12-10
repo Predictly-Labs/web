@@ -53,25 +53,25 @@ export const RiskSelectionStep: React.FC<RiskSelectionStepProps> = ({
           transition={{ duration: 0.3, delay: 0.1 }}
         >
           <div className="relative z-10">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-center mb-6">
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
                 selectedRisk === 'full' ? '' : ''
               }`}>
                 <Lottie 
                   animationData={fullDegenAnimation} 
                   loop={true} 
-                  className="w-12 h-12"
+                  className="w-20 h-20"
                 />
               </div>
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+              {/* <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                 selectedRisk === 'full'
                   ? 'border-white bg-white'
                   : 'border-gray-300'
               }`}>
                 {selectedRisk === 'full' && (
-                  <div className="w-3 h-3 bg-red-500 rounded-full" />
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full" />
                 )}
-              </div>
+              </div> */}
             </div>
             
             <div className="space-y-4">
@@ -91,7 +91,7 @@ export const RiskSelectionStep: React.FC<RiskSelectionStepProps> = ({
                     <Image src="/assets/logo/defi-protocol-logo/Layer Bank.jpg" alt="Layer Bank" width={16} height={16} className="rounded-full" />
                     <Image src="/assets/logo/defi-protocol-logo/MovePosition.jpg" alt="MovePosition" width={16} height={16} className="rounded-full" />
                   </div>
-                  Principal + yield from DeFi
+                  Principal & yield from DeFi
                 </div>
               </div>
               
@@ -122,17 +122,17 @@ export const RiskSelectionStep: React.FC<RiskSelectionStepProps> = ({
           transition={{ duration: 0.3, delay: 0.2 }}
         >
           <div className="relative z-10">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-center mb-6">
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
                 selectedRisk === 'zero' ? '' : ''
               }`}>
                 <Lottie 
                   animationData={noRiskAnimation} 
                   loop={true} 
-                  className="w-12 h-12"
+                  className="w-20 h-20"
                 />
               </div>
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+              {/* <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                 selectedRisk === 'zero'
                   ? 'border-white bg-white'
                   : 'border-gray-300'
@@ -140,7 +140,7 @@ export const RiskSelectionStep: React.FC<RiskSelectionStepProps> = ({
                 {selectedRisk === 'zero' && (
                   <div className="w-3 h-3 bg-green-500 rounded-full" />
                 )}
-              </div>
+              </div> */}
             </div>
             
             <div className="space-y-4">
