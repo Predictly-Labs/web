@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Users, ArrowLeft } from 'lucide-react';
+import { Users, ArrowLeft, Plus } from 'lucide-react';
 import { GroupCard } from './GroupCard';
 import { GroupMarkets } from './GroupMarkets';
 import Sidebar from "../../../ui/Sidebar";
@@ -249,21 +249,41 @@ export const Groups: React.FC<GroupsProps> = ({
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-100">
-          {selectedGroup ? (
-            <GroupMarkets 
-              group={selectedGroup}
-              onMarketClick={handleMarketClick}
-            />
-          ) : (
-            <div className="space-y-8">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold text-gray-900">All Groups</h2>
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-2 border border-gray-100">
+          <div 
+            className="space-y-8 relative p-6 rounded-3xl overflow-hidden"
+            style={{
+              backgroundImage: "url('/assets/main/background/bg-market.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+          <div className="absolute inset-0 bg-white/70"></div>
+          <div className="relative z-10">
+            {selectedGroup ? (
+              <GroupMarkets 
+                group={selectedGroup}
+                onMarketClick={handleMarketClick}
+              />
+            ) : (
+              <div className="space-y-8">
+                <div className="flex items-center justify-between mb-8">
+                  {/* <h2 className="text-2xl font-semibold text-gray-900">All Groups</h2> */}
+                  <button
+                    className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
+                  >
+                    <div className="bg-white rounded-full p-1">
+                      <Plus className="w-2 h-2 text-black" />
+                    </div>
+                    Create Your Groups
+                  </button>
+                </div>
+                
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Users className="w-4 h-4" />
                   <span>{displayGroups.length} groups available</span>
                 </div>
-              </div>
 
               {displayGroups.length > 0 ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -284,8 +304,10 @@ export const Groups: React.FC<GroupsProps> = ({
                   </p>
                 </div>
               )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
+          </div>
         </div>
       </div>
     </div>
