@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CreateMarketOnboarding } from './CreateMarketOnboarding';
 import { MarketHistory } from './MarketHistory';
 import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
+import { usePredictions } from '@/hooks/usePredictions';
+import { useAuth } from '@/contexts/AuthContext';
+import type { PredictionMarket } from '@/types/api';
 
 interface MarketFormData {
   title: string;
@@ -32,22 +35,57 @@ interface MarketData {
   groupImage?: string;
 }
 
+// Transform API PredictionMarket to UI MarketData format
+function transformMarket(market: PredictionMarket): MarketData {
+  const statusMap: Record<string, 'active' | 'closed' | 'pending'> = {
+    'ACTIVE': 'active',
+    'PENDING': 'pending',
+    'RESOLVED': 'closed',
+    'DISPUTED': 'pending',
+    'CANCELLED': 'closed',
+  };
+  return {
+    id: market.id,
+    title: market.title,
+    description: market.description || '',
+    creator: market.creator?.displayName || 'Unknown',
+    createdAt: market.createdAt,
+    endDate: market.endDate,
+    totalPool: market.totalVolume,
+    participants: market.participantCount,
+    status: statusMap[market.status] || 'pending',
+    category: market.marketType,
+    currentOdds: market.yesPercentage,
+    groupImage: market.group?.name ? '/assets/logo/defi-protocol-logo/Layer Bank.jpg' : undefined,
+  };
+}
+
 interface PredictionMarketProps {
   onMarketCreated?: (market: MarketFormData) => void;
   onMarketClick?: (market: MarketData) => void;
-  markets?: MarketData[];
 }
 
 export const PredictionMarket: React.FC<PredictionMarketProps> = ({
   onMarketCreated,
   onMarketClick,
-  markets = []
 }) => {
+  const { isAuthenticated } = useAuth();
+  const { markets: apiMarkets, isLoading, error, fetchMarkets } = usePredictions();
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Fetch all markets on mount
+  useEffect(() => {
+    fetchMarkets().catch(console.error);
+  }, [fetchMarkets]);
+
+  // Transform API markets to UI format
+  const displayMarkets: MarketData[] = apiMarkets.map(transformMarket);
 
   const handleMarketCreated = (data: MarketFormData) => {
     onMarketCreated?.(data);
     setShowOnboarding(false);
+    // Refresh markets after creation
+    fetchMarkets().catch(console.error);
   };
 
   const handleMarketClick = (market: MarketData) => {
@@ -98,9 +136,12 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
 
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-2 border border-gray-100">
           <MarketHistory 
-            markets={markets}
+            markets={displayMarkets}
+            isLoading={isLoading}
+            error={error}
             onMarketClick={handleMarketClick}
             onCreateMarket={handleCreateClick}
+            onRetry={() => fetchMarkets()}
           />
         </div>
 

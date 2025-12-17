@@ -93,7 +93,7 @@ export const Hero = () => {
                   playsInline
                   className="w-full h-full object-cover"
                 >
-                  <source src="/assets/landing/animation /landing-animation.mp4" type="video/mp4" />
+                  <source src="/assets/landing/animation/landing-animation.mp4" type="video/mp4" />
                 </video>
               </div>
 

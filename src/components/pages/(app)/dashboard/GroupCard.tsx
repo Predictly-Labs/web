@@ -1,31 +1,23 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useGroups } from "@/hooks/useGroups";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loader2, Users } from "lucide-react";
 
 export const GroupCard = () => {
-  const groups = [
-    {
-      id: 1,
-      name: "Crypto Bulls",
-      members: 12,
-      activePredictions: 8,
-      avatar: "/assets/main/background/1.jpeg",
-    },
-    {
-      id: 2,
-      name: "DeFi Degens",
-      members: 8,
-      activePredictions: 15,
-      avatar: "/assets/main/background/2.jpeg",
-    },
-    {
-      id: 3,
-      name: "Market Makers",
-      members: 24,
-      activePredictions: 32,
-      avatar: "/assets/main/background/3.jpeg",
-    },
-  ];
+  const { isAuthenticated } = useAuth();
+  const { groups, isLoading, fetchGroups } = useGroups();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchGroups().catch(console.error);
+    }
+  }, [isAuthenticated, fetchGroups]);
+
+  const displayGroups = groups.slice(0, 3);
 
   return (
     <div
@@ -43,62 +35,57 @@ export const GroupCard = () => {
           <h3 className="text-lg font-medium text-gray-900">My Groups</h3>
         </div>
 
-        <div className="space-y-4">
-          {groups.map((group) => (
-            <div
-              key={group.id}
-              className="bg-gray-50 rounded-2xl p-3 hover:bg-gray-100 transition-colors h-20"
-            >
-              <div className="flex items-center gap-3 h-full">
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-white ring-2 ring-gray-100">
-                  <Image
-                    src={group.avatar}
-                    alt={group.name}
-                    width={48}
-                    height={48}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-
-                <div className="flex-1">
-                  <h4 className="text-sm font-medium text-gray-900">
-                    {group.name}
-                  </h4>
-                  <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
-                    <span>{group.members} members</span>
-                    <span>{group.activePredictions} active predictions</span>
-                  </div>
-                </div>
-
-                <button className="text-blue-600 hover:text-blue-700 transition-colors">
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+          </div>
+        ) : displayGroups.length > 0 ? (
+          <div className="space-y-4">
+            {displayGroups.map((group) => (
+              <div
+                key={group.id}
+                className="bg-gray-50 rounded-2xl p-3 hover:bg-gray-100 transition-colors h-20"
+              >
+                <div className="flex items-center gap-3 h-full">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-white ring-2 ring-gray-100">
+                    <Image
+                      src={group.iconUrl || "/assets/main/background/1.jpeg"}
+                      alt={group.name}
+                      width={48}
+                      height={48}
+                      className="object-cover w-full h-full"
                     />
-                  </svg>
-                </button>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium text-gray-900">{group.name}</h4>
+                    <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
+                      <span>{group._count?.members || 0} members</span>
+                      <span>{group._count?.markets || 0} markets</span>
+                    </div>
+                  </div>
+                  <Link href="/app/groups" className="text-blue-600 hover:text-blue-700 transition-colors">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <Users className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+            <p className="text-sm text-gray-500">No groups yet</p>
+          </div>
+        )}
 
         <div className="mt-2 pt-3 border-t border-gray-100 text-center">
-          <button className="bg-black text-white py-2 px-4 rounded-full text-xs font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 mx-auto">
-            <span>View All Group</span>
+          <Link href="/app/groups" className="bg-black text-white py-2 px-4 rounded-full text-xs font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 mx-auto w-fit">
+            <span>View All Groups</span>
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
     </div>

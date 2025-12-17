@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { PredictionCard } from "./PredictionCard";
 import { ActivityCard } from "./ActivityCard";
 import { BalanceCard } from "./BalanceCard";
@@ -8,8 +9,19 @@ import { DefiCard } from "./DeFiCard";
 import { GroupCard } from "./GroupCard";
 import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from "@/hooks/useUser";
 
 export const Dashboard = () => {
+  const { isAuthenticated } = useAuth();
+  const { user, fetchUser, accuracy } = useUser();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUser().catch(console.error);
+    }
+  }, [isAuthenticated, fetchUser]);
+
   return (
     <div
       className="p-3 sm:p-6 min-h-screen relative bg-[#f7f5fa]"
@@ -47,7 +59,10 @@ export const Dashboard = () => {
                       className="object-contain"
                     />
                   </div>
-                  <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center">Welcome back! Here's what's happening with your predictions.</p>
+                  <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center">
+                    {user ? `Welcome back, ${user.displayName || 'Predictor'}! ` : 'Welcome back! '}
+                    Here's what's happening with your predictions.
+                  </p>
                 </div>
               </div>
             </div>

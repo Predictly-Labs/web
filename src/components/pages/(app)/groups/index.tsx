@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Users, ArrowLeft, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, ArrowLeft, Plus, Loader2, UserPlus } from 'lucide-react';
 import { GroupCard } from './GroupCard';
 import { GroupMarkets } from './GroupMarkets';
+import { CreateGroupModal } from './CreateGroupModal';
+import { JoinGroupModal } from './JoinGroupModal';
 import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
+import { useGroups } from '@/hooks/useGroups';
+import type { Group } from '@/types/api';
 
 interface GroupMember {
   id: string;
@@ -43,242 +47,50 @@ interface GroupData {
   markets: MarketData[];
 }
 
+// Transform API Group to UI GroupData format
+function transformGroup(group: Group): GroupData {
+  return {
+    id: group.id,
+    name: group.name,
+    description: group.description || '',
+    avatar: group.iconUrl || '/assets/logo/defi-protocol-logo/Layer Bank.jpg',
+    memberCount: group._count?.members || 0,
+    activeMarkets: group._count?.markets || 0,
+    totalVolume: 0,
+    owner: 'Creator',
+    members: [],
+    createdAt: group.createdAt,
+    isPrivate: !group.isPublic,
+    markets: [],
+  };
+}
+
 interface GroupsProps {
   onGroupClick?: (group: GroupData) => void;
   onMarketClick?: (market: MarketData) => void;
-  groups?: GroupData[];
 }
 
-export const Groups: React.FC<GroupsProps> = ({
-  onGroupClick,
-  onMarketClick,
-  groups = []
-}) => {
+export const Groups: React.FC<GroupsProps> = ({ onGroupClick, onMarketClick }) => {
+  const { groups: apiGroups, isLoading, error, fetchGroups } = useGroups();
   const [selectedGroup, setSelectedGroup] = useState<GroupData | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
 
-  const defaultGroups: GroupData[] = [
-    {
-      id: '1',
-      name: 'Crypto Bulls',
-      description: 'A group of cryptocurrency enthusiasts making predictions about digital assets and blockchain technology.',
-      avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg',
-      memberCount: 24,
-      activeMarkets: 8,
-      totalVolume: 12500,
-      owner: 'Alex Chen',
-      members: [
-        { id: '1', name: 'Alex Chen', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg', isOwner: true },
-        { id: '2', name: 'Sarah Kim', avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg' },
-        { id: '3', name: 'Mike Johnson', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg' },
-        { id: '4', name: 'Lisa Wong', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' }
-      ],
-      createdAt: '2024-11-15',
-      isPrivate: false,
-      markets: [
-        {
-          id: '1',
-          title: 'Will Bitcoin reach $100k by end of 2024?',
-          description: 'Prediction on Bitcoin price reaching $100,000 before December 31, 2024',
-          endDate: '2024-12-31',
-          totalPool: 2500,
-          participants: 18,
-          status: 'active',
-          category: 'Crypto',
-          currentOdds: 65,
-          createdBy: 'Alex Chen',
-          createdAt: '2024-12-01'
-        },
-        {
-          id: '2',
-          title: 'Ethereum 2.0 staking rewards above 5% in 2025?',
-          description: 'Will Ethereum staking APY exceed 5% at any point in 2025?',
-          endDate: '2025-12-31',
-          totalPool: 1800,
-          participants: 12,
-          status: 'active',
-          category: 'Crypto',
-          currentOdds: 42,
-          createdBy: 'Sarah Kim',
-          createdAt: '2024-12-05'
-        }
-      ]
-    },
-    {
-      id: '2',
-      name: 'DeFi Degens',
-      description: 'High-risk, high-reward DeFi predictions and yield farming strategies.',
-      avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg',
-      memberCount: 15,
-      activeMarkets: 5,
-      totalVolume: 8300,
-      owner: 'John Doe',
-      members: [
-        { id: '1', name: 'John Doe', avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg', isOwner: true },
-        { id: '2', name: 'Emma Davis', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg' },
-        { id: '3', name: 'Ryan Miller', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' }
-      ],
-      createdAt: '2024-10-20',
-      isPrivate: true,
-      markets: [
-        {
-          id: '3',
-          title: 'New DeFi protocol will reach $1B TVL in Q1 2025?',
-          description: 'Will any new DeFi protocol launched in 2024 reach $1 billion total value locked by March 2025?',
-          endDate: '2025-03-31',
-          totalPool: 3200,
-          participants: 14,
-          status: 'active',
-          category: 'DeFi',
-          currentOdds: 28,
-          createdBy: 'John Doe',
-          createdAt: '2024-11-20'
-        }
-      ]
-    },
-    {
-      id: '3',
-      name: 'Market Makers',
-      description: 'Professional traders and analysts predicting market movements and economic events.',
-      avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg',
-      memberCount: 32,
-      activeMarkets: 12,
-      totalVolume: 25600,
-      owner: 'Maria Garcia',
-      members: [
-        { id: '1', name: 'Maria Garcia', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg', isOwner: true },
-        { id: '2', name: 'David Lee', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' },
-        { id: '3', name: 'Sophie Turner', avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg' },
-        { id: '4', name: 'James Wilson', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg' }
-      ],
-      createdAt: '2024-09-10',
-      isPrivate: false,
-      markets: [
-        {
-          id: '4',
-          title: 'S&P 500 will hit 6000 before 2025?',
-          description: 'Will the S&P 500 index reach 6000 points before January 1, 2025?',
-          endDate: '2024-12-31',
-          totalPool: 5000,
-          participants: 28,
-          status: 'active',
-          category: 'Markets',
-          currentOdds: 73,
-          createdBy: 'Maria Garcia',
-          createdAt: '2024-11-10'
-        },
-        {
-          id: '5',
-          title: 'Fed will cut rates 3 times in 2024?',
-          description: 'Will the Federal Reserve cut interest rates at least 3 times during 2024?',
-          endDate: '2024-12-31',
-          totalPool: 4200,
-          participants: 22,
-          status: 'closed',
-          category: 'Economics',
-          createdBy: 'David Lee',
-          createdAt: '2024-08-15'
-        }
-      ]
-    },
-    {
-      id: '4',
-      name: 'DeFi Degens',
-      description: 'High-risk, high-reward DeFi predictions and yield farming strategies.',
-      avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg',
-      memberCount: 15,
-      activeMarkets: 5,
-      totalVolume: 8300,
-      owner: 'John Doe',
-      members: [
-        { id: '1', name: 'John Doe', avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg', isOwner: true },
-        { id: '2', name: 'Emma Davis', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg' },
-        { id: '3', name: 'Ryan Miller', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' }
-      ],
-      createdAt: '2024-10-20',
-      isPrivate: true,
-      markets: [
-        {
-          id: '3',
-          title: 'New DeFi protocol will reach $1B TVL in Q1 2025?',
-          description: 'Will any new DeFi protocol launched in 2024 reach $1 billion total value locked by March 2025?',
-          endDate: '2025-03-31',
-          totalPool: 3200,
-          participants: 14,
-          status: 'active',
-          category: 'DeFi',
-          currentOdds: 28,
-          createdBy: 'John Doe',
-          createdAt: '2024-11-20'
-        }
-      ]
-    },
-    {
-      id: '5',
-      name: 'DeFi Degens',
-      description: 'High-risk, high-reward DeFi predictions and yield farming strategies.',
-      avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg',
-      memberCount: 15,
-      activeMarkets: 5,
-      totalVolume: 8300,
-      owner: 'John Doe',
-      members: [
-        { id: '1', name: 'John Doe', avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg', isOwner: true },
-        { id: '2', name: 'Emma Davis', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg' },
-        { id: '3', name: 'Ryan Miller', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' }
-      ],
-      createdAt: '2024-10-20',
-      isPrivate: true,
-      markets: [
-        {
-          id: '3',
-          title: 'New DeFi protocol will reach $1B TVL in Q1 2025?',
-          description: 'Will any new DeFi protocol launched in 2024 reach $1 billion total value locked by March 2025?',
-          endDate: '2025-03-31',
-          totalPool: 3200,
-          participants: 14,
-          status: 'active',
-          category: 'DeFi',
-          currentOdds: 28,
-          createdBy: 'John Doe',
-          createdAt: '2024-11-20'
-        }
-      ]
-    },
-    {
-      id: '6',
-      name: 'DeFi Degens',
-      description: 'High-risk, high-reward DeFi predictions and yield farming strategies.',
-      avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg',
-      memberCount: 15,
-      activeMarkets: 5,
-      totalVolume: 8300,
-      owner: 'John Doe',
-      members: [
-        { id: '1', name: 'John Doe', avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg', isOwner: true },
-        { id: '2', name: 'Emma Davis', avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg' },
-        { id: '3', name: 'Ryan Miller', avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' }
-      ],
-      createdAt: '2024-10-20',
-      isPrivate: true,
-      markets: [
-        {
-          id: '3',
-          title: 'New DeFi protocol will reach $1B TVL in Q1 2025?',
-          description: 'Will any new DeFi protocol launched in 2024 reach $1 billion total value locked by March 2025?',
-          endDate: '2025-03-31',
-          totalPool: 3200,
-          participants: 14,
-          status: 'active',
-          category: 'DeFi',
-          currentOdds: 28,
-          createdBy: 'John Doe',
-          createdAt: '2024-11-20'
-        }
-      ]
-    },
-  ];
+  // Fetch groups on mount
+  useEffect(() => {
+    fetchGroups().catch(console.error);
+  }, [fetchGroups]);
 
-  const displayGroups = groups.length > 0 ? groups : defaultGroups;
+  const handleGroupCreated = () => {
+    fetchGroups().catch(console.error);
+  };
+
+  const handleGroupJoined = () => {
+    fetchGroups().catch(console.error);
+  };
+
+  // Transform API groups - no fallback to mockup
+  const displayGroups: GroupData[] = apiGroups.map(transformGroup);
 
   const handleGroupClick = (group: GroupData) => {
     setSelectedGroup(group);
@@ -293,7 +105,6 @@ export const Groups: React.FC<GroupsProps> = ({
     setSelectedGroup(null);
   };
 
-
   return (
     <div className="p-3 sm:p-6 min-h-screen relative bg-[#f7f5fa]">
       <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
@@ -304,19 +115,13 @@ export const Groups: React.FC<GroupsProps> = ({
           <div className="relative mb-6">
             <div 
               className="relative overflow-hidden rounded-2xl"
-              style={{
-                backgroundImage: "url('/assets/main/background/bg-flower.png')",
-                backgroundRepeat: "no-repeat",
-              }}
+              style={{ backgroundImage: "url('/assets/main/background/bg-flower.png')", backgroundRepeat: "no-repeat" }}
             >
               <div className="relative z-10 flex items-center justify-center gap-4 p-2">
                 <div className="flex-1 flex flex-col items-center justify-center">
                   <div className="flex items-center gap-4">
                     {selectedGroup && (
-                      <button
-                        onClick={handleBackToGroups}
-                        className="p-2 hover:bg-white/20 rounded-xl transition-colors"
-                      >
+                      <button onClick={handleBackToGroups} className="p-2 hover:bg-white/20 rounded-xl transition-colors">
                         <ArrowLeft className="w-6 h-6 text-pink-900" />
                       </button>
                     )}
@@ -324,20 +129,11 @@ export const Groups: React.FC<GroupsProps> = ({
                       <h1 className="text-2xl font-medium text-pink-900">
                         {selectedGroup ? selectedGroup.name : 'Groups'}
                       </h1>
-                      <Image
-                        src="/assets/main/icon/groups-icon.png"
-                        alt="Groups Icon"
-                        width={30}
-                        height={30}
-                        className="object-contain"
-                      />
+                      <Image src="/assets/main/icon/groups-icon.png" alt="Groups Icon" width={30} height={30} className="object-contain" />
                     </div>
                   </div>
                   <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center mt-1">
-                    {selectedGroup 
-                      ? 'View and manage prediction markets created by this group.'
-                      : 'Join groups and participate in their prediction markets.'
-                    }
+                    {selectedGroup ? 'View and manage prediction markets created by this group.' : 'Join groups and participate in their prediction markets.'}
                   </p>
                 </div>
               </div>
@@ -348,64 +144,82 @@ export const Groups: React.FC<GroupsProps> = ({
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-2 border border-gray-100">
           <div 
             className="space-y-8 relative p-6 rounded-3xl overflow-hidden"
-            style={{
-              backgroundImage: "url('/assets/main/background/bg-market.png')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
+            style={{ backgroundImage: "url('/assets/main/background/bg-market.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}
           >
-          <div className="absolute inset-0 bg-white/70"></div>
-          <div className="relative z-10">
-            {selectedGroup ? (
-              <GroupMarkets 
-                group={selectedGroup}
-                onMarketClick={handleMarketClick}
-              />
-            ) : (
-              <div className="space-y-8">
-                <div className="flex items-center justify-between mb-8">
-                  {/* <h2 className="text-2xl font-semibold text-gray-900">All Groups</h2> */}
-                  <button
-                    className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
-                  >
-                    <div className="bg-white rounded-full p-1">
-                      <Plus className="w-2 h-2 text-black" />
-                    </div>
-                    Create New Groups
-                  </button>
-                </div>
-                
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Users className="w-4 h-4" />
-                  <span>{displayGroups.length} groups available</span>
-                </div>
-
-              {displayGroups.length > 0 ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {displayGroups.map(group => (
-                    <GroupCard 
-                      key={group.id} 
-                      group={group}
-                      onClick={handleGroupClick}
-                    />
-                  ))}
-                </div>
+            <div className="absolute inset-0 bg-white/70"></div>
+            <div className="relative z-10">
+              {selectedGroup ? (
+                <GroupMarkets group={selectedGroup} onMarketClick={handleMarketClick} />
               ) : (
-                <div className="text-center py-16">
-                  <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-medium text-gray-900 mb-2">No Groups Yet</h3>
-                  <p className="text-gray-600 max-w-md mx-auto">
-                    Start by creating your first group to organize prediction markets with friends.
-                  </p>
+                <div className="space-y-8">
+                  <div className="flex items-center justify-between mb-8 gap-3">
+                    <button 
+                      onClick={() => setShowCreateModal(true)}
+                      className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
+                    >
+                      <div className="bg-white rounded-full p-1">
+                        <Plus className="w-2 h-2 text-black" />
+                      </div>
+                      Create New Group
+                    </button>
+                    <button 
+                      onClick={() => setShowJoinModal(true)}
+                      className="flex items-center gap-2 bg-white text-gray-800 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      Join with Code
+                    </button>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Users className="w-4 h-4" />
+                    <span>{displayGroups.length} groups available</span>
+                  </div>
+
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-16">
+                      <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                      <span className="ml-2 text-gray-500">Loading groups...</span>
+                    </div>
+                  ) : error ? (
+                    <div className="text-center py-16">
+                      <p className="text-red-500 mb-4">{error}</p>
+                      <button onClick={() => fetchGroups()} className="text-blue-600 hover:underline">
+                        Try again
+                      </button>
+                    </div>
+                  ) : displayGroups.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {displayGroups.map(group => (
+                        <GroupCard key={group.id} group={group} onClick={handleGroupClick} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-16">
+                      <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                      <h3 className="text-xl font-medium text-gray-900 mb-2">No Groups Yet</h3>
+                      <p className="text-gray-600 max-w-md mx-auto">
+                        Start by creating your first group to organize prediction markets with friends.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
-              </div>
-            )}
-          </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <CreateGroupModal 
+        isOpen={showCreateModal} 
+        onClose={() => setShowCreateModal(false)} 
+        onSuccess={handleGroupCreated}
+      />
+      <JoinGroupModal 
+        isOpen={showJoinModal} 
+        onClose={() => setShowJoinModal(false)} 
+        onSuccess={handleGroupJoined}
+      />
     </div>
   );
 };
