@@ -39,6 +39,8 @@ interface CreateMarketFormProps {
   groupType?: 'create' | 'select';
   groupName?: string;
   riskType?: 'full' | 'zero';
+  isSubmitting?: boolean;
+  submitError?: string | null;
 }
 
 const FormInput: React.FC<FormInputProps> = ({ label, icon: Icon, children }) => (
@@ -81,7 +83,9 @@ export const CreateMarketForm: React.FC<CreateMarketFormProps> = ({
   onBack, 
   groupType, 
   groupName, 
-  riskType 
+  riskType,
+  isSubmitting = false,
+  submitError = null,
 }) => {
   const [formData, setFormData] = useState<MarketFormData>({
     title: '',
@@ -213,12 +217,19 @@ export const CreateMarketForm: React.FC<CreateMarketFormProps> = ({
         </label>
       </div>
 
+      {submitError && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+          {submitError}
+        </div>
+      )}
+
       <div className="flex items-center justify-between pt-4">
         {onBack && (
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+            disabled={isSubmitting}
+            className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer disabled:opacity-50"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -227,11 +238,12 @@ export const CreateMarketForm: React.FC<CreateMarketFormProps> = ({
         
         <button
           type="submit"
-          className={`bg-black text-white py-4 px-8 rounded-xl font-medium hover:bg-gray-800 transition-colors cursor-pointer ${
+          disabled={isSubmitting}
+          className={`bg-black text-white py-4 px-8 rounded-xl font-medium hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
             onBack ? 'ml-auto' : 'w-full'
           }`}
         >
-          Create Market
+          {isSubmitting ? 'Creating...' : 'Create Market'}
         </button>
       </div>
     </form>

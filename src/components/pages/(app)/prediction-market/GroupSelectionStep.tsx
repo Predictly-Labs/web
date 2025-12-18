@@ -14,13 +14,21 @@ interface GroupOption {
 }
 
 interface GroupSelectionStepProps {
-  onNext: (selection: { type: 'create' | 'select' | 'invite'; groupId?: string; inviteCode?: string }) => void;
+  onNext: (selection: { type: 'create' | 'select' | 'invite'; groupId?: string; inviteCode?: string; newGroupName?: string }) => void;
   onBack?: () => void;
+  groups?: GroupOption[];
+  isLoadingGroups?: boolean;
+  isSubmitting?: boolean;
+  error?: string | null;
 }
 
 export const GroupSelectionStep: React.FC<GroupSelectionStepProps> = ({
   onNext,
-  onBack
+  onBack,
+  groups = [],
+  isLoadingGroups = false,
+  isSubmitting = false,
+  error = null,
 }) => {
   const [selectedOption, setSelectedOption] = useState<'create' | 'select' | 'invite' | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string>('');
@@ -29,29 +37,14 @@ export const GroupSelectionStep: React.FC<GroupSelectionStepProps> = ({
   const [newGroupName, setNewGroupName] = useState<string>('');
   const [generatedInviteCode, setGeneratedInviteCode] = useState<string>('');
 
-  const existingGroups: GroupOption[] = [
-    {
-      id: '1',
-      name: 'Crypto Bulls',
-      memberCount: 24,
-      avatar: '/assets/logo/defi-protocol-logo/Layer Bank.jpg',
-      description: 'A group of cryptocurrency enthusiasts making predictions about digital assets.'
-    },
-    {
-      id: '2',
-      name: 'DeFi Degens',
-      memberCount: 15,
-      avatar: '/assets/logo/defi-protocol-logo/Canopy.jpg',
-      description: 'High-risk, high-reward DeFi predictions and yield farming strategies.'
-    },
-    {
-      id: '3',
-      name: 'Market Makers',
-      memberCount: 32,
-      avatar: '/assets/logo/defi-protocol-logo/MovePosition.jpg',
-      description: 'Professional traders and analysts predicting market movements.'
-    }
-  ];
+  // Use groups from props, with fallback to empty array
+  const existingGroups: GroupOption[] = groups.map(g => ({
+    id: g.id,
+    name: g.name,
+    memberCount: g.memberCount || 0,
+    avatar: g.avatar || '/assets/logo/defi-protocol-logo/Layer Bank.jpg',
+    description: g.description || 'No description',
+  }));
 
   const generateRandomGroupName = () => {
     const adjectives = ['Elite', 'Crypto', 'DeFi', 'Smart', 'Pro', 'Alpha', 'Meta', 'Digital', 'Web3', 'Blockchain'];
@@ -88,7 +81,8 @@ export const GroupSelectionStep: React.FC<GroupSelectionStepProps> = ({
       onNext({
         type: selectedOption,
         groupId: selectedOption === 'select' ? selectedGroupId : undefined,
-        inviteCode: selectedOption === 'invite' ? inviteCode : undefined
+        inviteCode: selectedOption === 'invite' ? inviteCode : undefined,
+        newGroupName: selectedOption === 'create' ? newGroupName : undefined,
       });
     }
   };
@@ -405,6 +399,12 @@ export const GroupSelectionStep: React.FC<GroupSelectionStepProps> = ({
         </motion.div>
       </div>
 
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+          {error}
+        </div>
+      )}
+
       <motion.div 
         className="flex items-center justify-between pt-4"
         initial={{ opacity: 0, y: 10 }}
@@ -414,7 +414,8 @@ export const GroupSelectionStep: React.FC<GroupSelectionStepProps> = ({
         {onBack && (
           <button
             onClick={onBack}
-            className="px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+            disabled={isSubmitting}
+            className="px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer disabled:opacity-50"
           >
             Back
           </button>
@@ -422,15 +423,15 @@ export const GroupSelectionStep: React.FC<GroupSelectionStepProps> = ({
         
         <button
           onClick={handleNext}
-          disabled={!canProceed}
+          disabled={!canProceed || isSubmitting}
           className={`ml-auto flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all cursor-pointer ${
-            canProceed
+            canProceed && !isSubmitting
               ? 'bg-black text-white hover:bg-gray-800'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
           }`}
         >
-          Continue
-          <ArrowRight className="w-4 h-4" />
+          {isSubmitting ? 'Processing...' : 'Continue'}
+          {!isSubmitting && <ArrowRight className="w-4 h-4" />}
         </button>
       </motion.div>
     </div>

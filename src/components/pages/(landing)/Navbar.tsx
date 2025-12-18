@@ -3,14 +3,18 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { ConnectWalletButton } from "@/components/ui/ConnectWalletButton";
+import { UserMenu } from "@/components/ui/UserMenu";
 
 export const Navbar = () => {
-  const handleNavClick = (section: string) => {
-    console.log(`Navigate to ${section}`);
-  };
+  const { isAuthenticated } = useAuth();
 
-  const handleLaunchApp = () => {
-    console.log("Launch App clicked");
+  const handleNavClick = (section: string) => {
+    const element = document.getElementById(section);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -52,14 +56,26 @@ export const Navbar = () => {
             >
               FAQ
             </button>
-            <Link href="/app/dashboard">
-              <button
-                onClick={handleLaunchApp}
-                className="bg-black text-white px-6 py-2 rounded-2xl text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer"
-              >
-                Launch App
-              </button>
-            </Link>
+            
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <Link href="/app/dashboard">
+                  <button className="bg-black text-white px-6 py-2 rounded-2xl text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer">
+                    Launch App
+                  </button>
+                </Link>
+                <UserMenu />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <ConnectWalletButton variant="outline" size="md" />
+                <Link href="/app/dashboard">
+                  <button className="bg-black text-white px-6 py-2 rounded-2xl text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer">
+                    Launch App
+                  </button>
+                </Link>
+              </div>
+            )}
           </div>
 
           <button className="md:hidden flex items-center justify-center w-8 h-8">

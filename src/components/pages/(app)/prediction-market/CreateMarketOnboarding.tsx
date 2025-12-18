@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { OnboardingModal } from './OnboardingModal';
 import { GroupSelectionStep } from './GroupSelectionStep';
 import { RiskSelectionStep, RiskType } from './RiskSelectionStep';
 import { CreateMarketForm } from './CreateMarketForm';
+import { usePredictions } from '@/hooks/usePredictions';
+import { useGroups } from '@/hooks/useGroups';
+import type { CreateMarketInput } from '@/types/requests';
 
 interface MarketFormData {
   title: string;
@@ -39,18 +42,69 @@ export const CreateMarketOnboarding: React.FC<CreateMarketOnboardingProps> = ({
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('group');
   const [groupSelection, setGroupSelection] = useState<GroupSelection | null>(null);
   const [riskType, setRiskType] = useState<RiskType | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const existingGroups = [
-    { id: '1', name: 'Crypto Bulls' },
-    { id: '2', name: 'DeFi Degens' },
-    { id: '3', name: 'Market Makers' }
-  ];
+  const { createMarket } = usePredictions();
+  const { groups, fetchGroups, createGroup, joinGroup } = useGroups();
 
-  const handleGroupSelection = (selection: GroupSelection) => {
-    const selectedGroup = existingGroups.find(g => g.id === selection.groupId);
+  // Fetch groups when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchGroups().catch(console.error);
+    }
+  }, [isOpen, fetchGroups]);
+
+  const handleGroupSelection = async (selection: GroupSelection & { newGroupName?: string }) => {
+    setSubmitError(null);
+    
+    // If creating a new group, create it first
+    if (selection.type === 'create' && selection.newGroupName) {
+      setIsSubmitting(true);
+      try {
+        const result = await createGroup({
+          name: selection.newGroupName,
+          description: `Group for prediction markets`,
+          isPublic: true,
+        });
+        setGroupSelection({
+          type: 'select',
+          groupId: result.data.id,
+          groupName: result.data.name,
+        });
+        setCurrentStep('risk');
+      } catch (err: any) {
+        setSubmitError(err.response?.data?.message || 'Failed to create group');
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    // If joining with invite code
+    if (selection.type === 'invite' && selection.inviteCode) {
+      setIsSubmitting(true);
+      try {
+        const result = await joinGroup({ inviteCode: selection.inviteCode });
+        setGroupSelection({
+          type: 'select',
+          groupId: result.data.id,
+          groupName: result.data.name,
+        });
+        setCurrentStep('risk');
+      } catch (err: any) {
+        setSubmitError(err.response?.data?.message || 'Failed to join group');
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    // If selecting existing group
+    const selectedGroup = groups.find(g => g.id === selection.groupId);
     setGroupSelection({
       ...selection,
-      groupName: selectedGroup?.name || (selection.type === 'invite' ? `Invite Code: ${selection.inviteCode}` : undefined)
+      groupName: selectedGroup?.name,
     });
     setCurrentStep('risk');
   };
@@ -60,9 +114,37 @@ export const CreateMarketOnboarding: React.FC<CreateMarketOnboardingProps> = ({
     setCurrentStep('form');
   };
 
-  const handleFormSubmit = (data: MarketFormData) => {
-    onMarketCreated?.(data);
-    handleClose();
+  const handleFormSubmit = async (data: MarketFormData) => {
+    if (!groupSelection?.groupId) {
+      setSubmitError('Please select a group first');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Combine date and time into ISO string
+      const endDateTime = new Date(`${data.endDate}T${data.endTime}`).toISOString();
+      
+      const marketInput: CreateMarketInput = {
+        groupId: groupSelection.groupId,
+        title: data.title,
+        description: data.description || undefined,
+        endDate: endDateTime,
+        marketType: riskType === 'zero' ? 'NO_LOSS' : 'STANDARD',
+        minStake: 1,
+        maxStake: parseFloat(data.poolSize) || 1000,
+      };
+
+      await createMarket(marketInput);
+      onMarketCreated?.(data);
+      handleClose();
+    } catch (err: any) {
+      setSubmitError(err.response?.data?.message || 'Failed to create market');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBack = () => {
@@ -114,6 +196,15 @@ export const CreateMarketOnboarding: React.FC<CreateMarketOnboardingProps> = ({
       {currentStep === 'group' && (
         <GroupSelectionStep
           onNext={handleGroupSelection}
+          groups={groups.map(g => ({
+            id: g.id,
+            name: g.name,
+            memberCount: g.memberCount || 0,
+            avatar: g.iconUrl || '/assets/logo/defi-protocol-logo/Layer Bank.jpg',
+            description: g.description || 'No description',
+          }))}
+          isSubmitting={isSubmitting}
+          error={submitError}
         />
       )}
       
@@ -131,6 +222,8 @@ export const CreateMarketOnboarding: React.FC<CreateMarketOnboardingProps> = ({
           groupType={groupSelection?.type === 'invite' ? undefined : groupSelection?.type}
           groupName={groupSelection?.groupName}
           riskType={riskType || undefined}
+          isSubmitting={isSubmitting}
+          submitError={submitError}
         />
       )}
     </OnboardingModal>

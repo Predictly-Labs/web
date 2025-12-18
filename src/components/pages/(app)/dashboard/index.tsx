@@ -11,6 +11,9 @@ import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser } from "@/hooks/useUser";
+import { ConnectWalletButton } from "@/components/ui/ConnectWalletButton";
+import { UserMenu } from "@/components/ui/UserMenu";
+import { Wallet } from "lucide-react";
 
 export const Dashboard = () => {
   const { isAuthenticated } = useAuth();
@@ -22,21 +25,43 @@ export const Dashboard = () => {
     }
   }, [isAuthenticated, fetchUser]);
 
+  // Show connect wallet prompt if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="p-3 sm:p-6 min-h-screen relative bg-[#f7f5fa]">
+        <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+        <Sidebar />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+            <div className="bg-white rounded-3xl p-8 shadow-sm max-w-md w-full">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Wallet className="w-8 h-8 text-gray-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Connect Your Wallet</h2>
+              <p className="text-gray-500 mb-6">
+                Connect your wallet to view your dashboard, predictions, and rewards.
+              </p>
+              <ConnectWalletButton variant="primary" size="lg" className="w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="p-3 sm:p-6 min-h-screen relative bg-[#f7f5fa]"
-      // style={{
-      //   backgroundImage: "url('/assets/main/background/1.jpeg')",
-      //   backgroundSize: "cover",
-      //   backgroundPosition: "center",
-      //   backgroundRepeat: "no-repeat",
-      //   backgroundAttachment: "fixed"
-      // }}
     >
       <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
       <Sidebar />
 
       <div className="max-w-7xl mx-auto relative z-10">
+        {/* Header with UserMenu */}
+        <div className="flex justify-end mb-2">
+          <UserMenu />
+        </div>
+
         <div className="mb-4">
           <div className="relative mb-6">
             <div 
@@ -46,7 +71,6 @@ export const Dashboard = () => {
                 backgroundRepeat: "no-repeat",
               }}
             >
-              {/* <div className="absolute inset-0 bg-black/10"></div> */}
               <div className="relative z-10 flex items-center  justify-center gap-4 p-2">
                 <div className="flex-1 flex flex-col items-center justify-center">
                   <div className="flex items-center gap-2 mb-1">

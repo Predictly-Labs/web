@@ -7,7 +7,7 @@ import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
 import { usePredictions } from '@/hooks/usePredictions';
 import { useAuth } from '@/contexts/AuthContext';
-import type { PredictionMarket } from '@/types/api';
+import type { PredictionMarket as PredictionMarketType } from '@/types/api';
 
 interface MarketFormData {
   title: string;
@@ -36,7 +36,7 @@ interface MarketData {
 }
 
 // Transform API PredictionMarket to UI MarketData format
-function transformMarket(market: PredictionMarket): MarketData {
+function transformMarket(market: PredictionMarketType): MarketData {
   const statusMap: Record<string, 'active' | 'closed' | 'pending'> = {
     'ACTIVE': 'active',
     'PENDING': 'pending',
