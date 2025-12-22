@@ -7,7 +7,7 @@ export const BalanceCard = () => {
     <div 
       className="rounded-3xl p-4 sm:p-8 h-auto min-h-[280px] w-full sm:min-h-[320px] relative overflow-hidden"
       style={{
-        backgroundImage: "url('/assets/main/background/bg-nav.jpeg')",
+        backgroundImage: "url('/assets/main/background/bg-nav-move.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

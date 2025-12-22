@@ -31,7 +31,7 @@ export const GroupCard = () => {
     <div
       className="rounded-3xl p-4 sm:p-6 w-full h-auto min-h-[300px] sm:min-h-[400px] relative overflow-hidden"
       style={{
-        backgroundImage: "url('/assets/main/background/bg-nav.jpeg')",
+        backgroundImage: "url('/assets/main/background/bg-nav-move.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
