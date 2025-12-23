@@ -63,17 +63,24 @@ export const Hero = () => {
               </motion.p>
               
               
-              <motion.button
-                onClick={handleStartNow}
-                className="bg-black text-white px-6 py-3 rounded-2xl font-open-runde font-semibold text-sm hover:bg-gray-800 transition-colors mt-4"
+              <motion.div
+                className="bg-white text-black px-6 py-3 rounded-2xl font-medium text-sm transition-colors mt-4 flex items-center gap-2 cursor-pointer"
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6, type: "spring", stiffness: 100 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={handleStartNow}
               >
-                Get Started
-              </motion.button>
+                Build with $MOVE
+                <Image
+                  src="/assets/logo/logo-coin/move-logo.jpeg"
+                  alt="Movement Labs"
+                  className="w-6 h-6 object-contain rounded-full"
+                  width={24}
+                  height={24}
+                />
+              </motion.div>
             </div>
           </div>
 
