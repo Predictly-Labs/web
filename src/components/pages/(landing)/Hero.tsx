@@ -21,12 +21,8 @@ interface MarketInfoProps {
 
 export const Hero = () => {
   const handleStartNow = () => {
-    console.log('Start Now clicked')
   }
 
-  const handleMoreDetails = () => {
-    console.log('More details clicked')
-  }
 
   return (
     <section className="relative min-h-screen bg-gray-50 overflow-hidden py-20">

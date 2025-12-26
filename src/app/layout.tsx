@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "@/providers/WalletProvider";
+import { AuthProvider } from "@/context/AuthContext";
 
 if (typeof window !== 'undefined') {
   require("@/utils/suppressWalletErrors");
@@ -33,7 +34,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
           <WalletProvider>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
           </WalletProvider>
       </body>
     </html>

@@ -31,7 +31,7 @@ export const DefiCard = () => {
     <div 
       className="rounded-3xl p-4 sm:p-8 w-full h-80 min-h-[280px] relative overflow-hidden"
       style={{
-        backgroundImage: "url('/assets/main/background/bg-nav-move.png')",
+        backgroundImage: "url('/assets/main/background/bg-main.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

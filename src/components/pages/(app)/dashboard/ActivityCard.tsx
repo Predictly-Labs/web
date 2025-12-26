@@ -15,7 +15,7 @@ export const ActivityCard = () => {
     <div
       className="bg-gray-50 rounded-4xl p-4 sm:p-8 h-auto min-h-[280px] w-full relative overflow-hidden"
       style={{
-        backgroundImage: "url('/assets/main/background/bg-nav-move.png')",
+        backgroundImage: "url('/assets/main/background/bg-main.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

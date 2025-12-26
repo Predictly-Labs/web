@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Users, TrendingUp, Clock, Crown } from 'lucide-react';
 import Image from 'next/image';
 
@@ -60,8 +60,15 @@ const GroupStats: React.FC<GroupStatsProps> = ({ label, value, icon: Icon }) => 
 );
 
 export const GroupCard: React.FC<GroupCardProps> = ({ group, onClick }) => {
+  const [groupImageError, setGroupImageError] = useState(false);
+  const [memberImageErrors, setMemberImageErrors] = useState<{ [key: string]: boolean }>({});
+
   const handleClick = () => {
     onClick?.(group);
+  };
+
+  const handleMemberImageError = (memberId: string) => {
+    setMemberImageErrors(prev => ({ ...prev, [memberId]: true }));
   };
 
   const formatVolume = (volume: number) => {
@@ -85,13 +92,12 @@ export const GroupCard: React.FC<GroupCardProps> = ({ group, onClick }) => {
       className="bg-white rounded-3xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all cursor-pointer group"
     >
       <div className="flex items-start gap-4 mb-4">
-        <div className="relative">
-          <Image
-            src={group.avatar}
+        <div className="relative w-[60px] h-[60px] rounded-2xl overflow-hidden">
+          <img
+            src={groupImageError ? "/assets/main/background/bg-flower.png" : group.avatar}
             alt={group.name}
-            width={60}
-            height={60}
-            className="rounded-2xl object-cover"
+            className="w-full h-full object-cover"
+            onError={() => setGroupImageError(true)}
           />
           {group.isPrivate && (
             <div className="absolute -top-1 -right-1 bg-yellow-100 border-2 border-white rounded-full p-1">
@@ -136,15 +142,14 @@ export const GroupCard: React.FC<GroupCardProps> = ({ group, onClick }) => {
           {group.members.slice(0, 4).map((member, index) => (
             <div
               key={member.id}
-              className="relative"
+              className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white"
               style={{ zIndex: 4 - index }}
             >
-              <Image
-                src={member.avatar}
+              <img
+                src={memberImageErrors[member.id] ? "/assets/main/background/bg-flower.png" : member.avatar}
                 alt={member.name}
-                width={32}
-                height={32}
-                className="rounded-full border-2 border-white object-cover"
+                className="w-full h-full object-cover"
+                onError={() => handleMemberImageError(member.id)}
               />
               {member.isOwner && (
                 <div className="absolute -top-1 -right-1 bg-blue-100 border border-white rounded-full p-0.5">

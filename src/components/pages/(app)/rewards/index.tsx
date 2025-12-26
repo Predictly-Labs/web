@@ -82,7 +82,7 @@ export const Rewards: React.FC<RewardsProps> = ({
             <div 
               className="relative overflow-hidden rounded-2xl"
               style={{
-                backgroundImage: "url('/assets/main/background/bg-flower.png')",
+                backgroundImage: "url('/assets/main/background/bg-main.png')",
                 backgroundRepeat: "no-repeat",
               }}
             >

@@ -67,7 +67,6 @@ export function WalletProvider({ children }: Props) {
               const response = await wallet.connect()
               setAddress(response.address)
               setConnected(true)
-              console.log(`Connected with ${provider.name} wallet`)
               return
             }
           } catch (error) {
