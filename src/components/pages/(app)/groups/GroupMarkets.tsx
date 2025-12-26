@@ -3,36 +3,9 @@
 import React, { useState } from 'react';
 import { Calendar, Users, TrendingUp, Clock, DollarSign, Target, Copy, Shield, Globe, Lock, Crown, Calendar as CalendarIcon } from 'lucide-react';
 import Image from 'next/image';
+import { MarketData, GroupMemberData } from '@/types/group';
 
-interface MarketData {
-  id: string;
-  title: string;
-  description: string;
-  endDate: string;
-  totalPool: number;
-  participants: number;
-  status: 'active' | 'closed' | 'pending';
-  category: string;
-  currentOdds?: number;
-  createdBy: string;
-  createdAt: string;
-}
-
-interface GroupMemberData {
-  id: string;
-  groupId: string;
-  userId: string;
-  role: 'ADMIN' | 'MEMBER';
-  joinedAt: string;
-  user: {
-    id: string;
-    displayName: string;
-    avatarUrl: string;
-    walletAddress: string;
-  };
-}
-
-interface GroupData {
+interface DetailedGroupData {
   id: string;
   name: string;
   description: string;
@@ -70,7 +43,7 @@ interface MarketCardProps {
 }
 
 interface GroupMarketsProps {
-  group: GroupData;
+  group: DetailedGroupData;
   onMarketClick?: (market: MarketData) => void;
 }
 
@@ -174,7 +147,7 @@ const MarketCard: React.FC<MarketCardProps> = ({ market, groupName, onClick }) =
   );
 };
 
-const GroupInfoHeader: React.FC<{ group: GroupData }> = ({ group }) => {
+const GroupInfoHeader: React.FC<{ group: DetailedGroupData }> = ({ group }) => {
   const [copiedInvite, setCopiedInvite] = useState(false);
 
   const formatDate = (dateString: string) => {

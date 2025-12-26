@@ -2,62 +2,7 @@
 
 import React, { useState } from "react";
 import { Users, TrendingUp, Clock, Crown } from "lucide-react";
-
-interface GroupMember {
-  id: string;
-  name: string;
-  avatar: string;
-  isOwner?: boolean;
-}
-
-interface MarketData {
-  id: string;
-  title: string;
-  description: string;
-  endDate: string;
-  totalPool: number;
-  participants: number;
-  status: "active" | "closed" | "pending";
-  category: string;
-  currentOdds?: number;
-  createdBy: string;
-  createdAt: string;
-}
-
-interface GroupData {
-  id: string;
-  name: string;
-  description: string;
-  avatar: string;
-  memberCount: number;
-  activeMarkets: number;
-  totalVolume: number;
-  owner: string;
-  members: GroupMember[];
-  createdAt: string;
-  isPrivate: boolean;
-  markets: MarketData[];
-  iconUrl?: string;
-  inviteCode?: string;
-  isPublic?: boolean;
-  createdById?: string;
-  updatedAt?: string;
-  createdBy?: {
-    id: string;
-    displayName: string;
-    avatarUrl: string;
-  };
-  _count?: {
-    members: number;
-    markets: number;
-  };
-  userRole?: string | null;
-  isMember?: boolean;
-  stats?: {
-    memberCount: number;
-    totalMarkets: number;
-  };
-}
+import { GroupData } from "@/types/group";
 
 interface GroupCardProps {
   group: GroupData;

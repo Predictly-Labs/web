@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "@/providers/WalletProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "sonner";
 
 if (typeof window !== 'undefined') {
   require("@/utils/suppressWalletErrors");
@@ -36,6 +37,7 @@ export default function RootLayout({
           <WalletProvider>
             <AuthProvider>
               {children}
+              <Toaster richColors position="bottom-right" />
             </AuthProvider>
           </WalletProvider>
       </body>

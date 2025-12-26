@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useCreateGroups } from '@/hooks/useCreateGroups'
 import { useAuth } from '@/hooks/useAuth'
+import { toast } from 'sonner'
 
 interface CreateGroupFormProps {
   isOpen: boolean
@@ -60,6 +61,10 @@ export const CreateGroupForm = ({ isOpen, onClose, onSuccess }: CreateGroupFormP
     const result = await createGroup(formData, iconFile || undefined)
     
     if (result) {
+      toast.success('Group created successfully!', {
+        description: `"${formData.name}" is ready for prediction markets.`,
+        duration: 4000,
+      })
       onSuccess()
       handleReset()
     }

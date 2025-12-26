@@ -10,64 +10,7 @@ import { useGetGroups } from "@/hooks/useGetGroups";
 import { useGetGroup } from "@/hooks/useGetGroupbyId";
 import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
-
-interface GroupMember {
-  id: string;
-  name: string;
-  avatar: string;
-  isOwner?: boolean;
-}
-
-interface MarketData {
-  id: string;
-  title: string;
-  description: string;
-  endDate: string;
-  totalPool: number;
-  participants: number;
-  status: "active" | "closed" | "pending";
-  category: string;
-  currentOdds?: number;
-  createdBy: string;
-  createdAt: string;
-}
-
-interface ApiGroup {
-  id: string;
-  name: string;
-  description: string;
-  iconUrl: string;
-  isPublic: boolean;
-  createdAt: string;
-  stats?: {
-    memberCount: number;
-    activeMarkets: number;
-    totalVolume: number;
-  };
-  _count?: {
-    members: number;
-    markets: number;
-  };
-}
-
-interface GroupData {
-  id: string;
-  name: string;
-  description: string;
-  avatar: string;
-  memberCount: number;
-  activeMarkets: number;
-  totalVolume: number;
-  owner: string;
-  members: GroupMember[];
-  createdAt: string;
-  isPrivate: boolean;
-  markets: MarketData[];
-  iconUrl?: string;
-  inviteCode?: string;
-  isPublic?: boolean;
-  createdById?: string;
-}
+import { GroupData, ApiGroup, MarketData } from "@/types/group";
 
 interface GroupsProps {
   onGroupClick?: (group: GroupData) => void;
@@ -128,6 +71,20 @@ export const Groups: React.FC<GroupsProps> = ({
         createdAt: group.createdAt,
         isPrivate: !group.isPublic,
         markets: [],
+        iconUrl: group.iconUrl,
+        inviteCode: undefined,
+        isPublic: group.isPublic,
+        createdById: undefined,
+        updatedAt: undefined,
+        createdBy: undefined,
+        _count: group._count,
+        userRole: undefined,
+        isMember: false,
+        stats: {
+          memberCount,
+          activeMarkets,
+          totalVolume,
+        },
       };
     });
   };
@@ -224,10 +181,11 @@ export const Groups: React.FC<GroupsProps> = ({
                     onMarketClick={handleMarketClick}
                   />
                 ) : (
-                  <GroupMarkets
-                    group={selectedGroup}
-                    onMarketClick={handleMarketClick}
-                  />
+                  <div className="flex items-center justify-center py-20">
+                    <div className="text-gray-500">
+                      Loading group details...
+                    </div>
+                  </div>
                 )
               ) : (
                 <div className="space-y-8">

@@ -5,6 +5,7 @@ import { X, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useJoinGroup } from '@/hooks/useJoinGroup'
 import { useAuth } from '@/hooks/useAuth'
+import { toast } from 'sonner'
 
 interface JoinGroupFormProps {
   isOpen: boolean
@@ -30,6 +31,10 @@ export const JoinGroupForm = ({ isOpen, onClose, onSuccess }: JoinGroupFormProps
     const result = await joinGroup(inviteCode.trim())
     
     if (result) {
+      toast.success('Successfully joined group!', {
+        description: 'You can now participate in group prediction markets.',
+        duration: 4000,
+      })
       onSuccess()
       handleReset()
     }
