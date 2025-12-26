@@ -65,6 +65,7 @@ export const useGetGroups = () => {
       }
 
       const result: GetGroupsResponse = await response.json()
+    
       
       setGroups(result.data)
       setPagination(result.meta)

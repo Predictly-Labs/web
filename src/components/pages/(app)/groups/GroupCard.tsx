@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Users, TrendingUp, Clock, Crown } from 'lucide-react';
-import Image from 'next/image';
+import React, { useState } from "react";
+import { Users, TrendingUp, Clock, Crown } from "lucide-react";
 
 interface GroupMember {
   id: string;
@@ -18,7 +17,7 @@ interface MarketData {
   endDate: string;
   totalPool: number;
   participants: number;
-  status: 'active' | 'closed' | 'pending';
+  status: "active" | "closed" | "pending";
   category: string;
   currentOdds?: number;
   createdBy: string;
@@ -38,6 +37,26 @@ interface GroupData {
   createdAt: string;
   isPrivate: boolean;
   markets: MarketData[];
+  iconUrl?: string;
+  inviteCode?: string;
+  isPublic?: boolean;
+  createdById?: string;
+  updatedAt?: string;
+  createdBy?: {
+    id: string;
+    displayName: string;
+    avatarUrl: string;
+  };
+  _count?: {
+    members: number;
+    markets: number;
+  };
+  userRole?: string | null;
+  isMember?: boolean;
+  stats?: {
+    memberCount: number;
+    totalMarkets: number;
+  };
 }
 
 interface GroupCardProps {
@@ -45,30 +64,11 @@ interface GroupCardProps {
   onClick?: (group: GroupData) => void;
 }
 
-interface GroupStatsProps {
-  label: string;
-  value: string | number;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const GroupStats: React.FC<GroupStatsProps> = ({ label, value, icon: Icon }) => (
-  <div className="flex items-center gap-2 text-sm">
-    <Icon className="w-4 h-4 text-gray-500" />
-    <span className="text-gray-600">{label}:</span>
-    <span className="font-medium text-gray-900">{value}</span>
-  </div>
-);
-
 export const GroupCard: React.FC<GroupCardProps> = ({ group, onClick }) => {
   const [groupImageError, setGroupImageError] = useState(false);
-  const [memberImageErrors, setMemberImageErrors] = useState<{ [key: string]: boolean }>({});
 
   const handleClick = () => {
     onClick?.(group);
-  };
-
-  const handleMemberImageError = (memberId: string) => {
-    setMemberImageErrors(prev => ({ ...prev, [memberId]: true }));
   };
 
   const formatVolume = (volume: number) => {
@@ -79,96 +79,78 @@ export const GroupCard: React.FC<GroupCardProps> = ({ group, onClick }) => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric' 
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
   return (
-    <div 
-      onClick={handleClick}
-      className="bg-white rounded-3xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all cursor-pointer group"
-    >
-      <div className="flex items-start gap-4 mb-4">
-        <div className="relative w-[60px] h-[60px] rounded-2xl overflow-hidden">
-          <img
-            src={groupImageError ? "/assets/main/background/bg-flower.png" : group.avatar}
-            alt={group.name}
-            className="w-full h-full object-cover"
-            onError={() => setGroupImageError(true)}
-          />
-          {group.isPrivate && (
-            <div className="absolute -top-1 -right-1 bg-yellow-100 border-2 border-white rounded-full p-1">
-              <Crown className="w-3 h-3 text-yellow-600" />
-            </div>
-          )}
-        </div>
-        
-        <div className="flex-1">
-          <h3 className="text-xl font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
-            {group.name}
-          </h3>
-          <p className="text-gray-600 text-sm line-clamp-2 mb-2">
-            {group.description}
-          </p>
-          <p className="text-xs text-gray-500">
-            Created {formatDate(group.createdAt)} • by {group.owner}
-          </p>
-        </div>
-      </div>
+    <div className="bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all group overflow-hidden">
+      {/* Header with gradient background */}
+      <div className="bg-linear-to-r from-blue-50 to-purple-50 p-4 pb-3">
+        <div className="flex items-center gap-3">
+          <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 shadow-sm">
+            <img
+              src={
+                groupImageError
+                  ? "/assets/main/background/bg-flower.png"
+                  : group.avatar
+              }
+              alt={group.name}
+              className="w-full h-full object-cover"
+              onError={() => setGroupImageError(true)}
+            />
+            {group.isPrivate && (
+              <div className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-1 shadow-sm">
+                <Crown className="w-2.5 h-2.5 text-white" />
+              </div>
+            )}
+          </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-        <GroupStats
-          label="Members"
-          value={group.memberCount}
-          icon={Users}
-        />
-        <GroupStats
-          label="Active Markets"
-          value={group.activeMarkets}
-          icon={TrendingUp}
-        />
-        <GroupStats
-          label="Volume"
-          value={formatVolume(group.totalVolume)}
-          icon={Clock}
-        />
-      </div>
-
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-        <div className="flex -space-x-2">
-          {group.members.slice(0, 4).map((member, index) => (
-            <div
-              key={member.id}
-              className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white"
-              style={{ zIndex: 4 - index }}
-            >
-              <img
-                src={memberImageErrors[member.id] ? "/assets/main/background/bg-flower.png" : member.avatar}
-                alt={member.name}
-                className="w-full h-full object-cover"
-                onError={() => handleMemberImageError(member.id)}
-              />
-              {member.isOwner && (
-                <div className="absolute -top-1 -right-1 bg-blue-100 border border-white rounded-full p-0.5">
-                  <Crown className="w-2.5 h-2.5 text-blue-600" />
-                </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+              {group.name}
+            </h3>
+            <div className="flex items-center gap-4 text-xs text-gray-600 mt-1.5">
+              <span className="flex items-center gap-1.5 bg-white/60 px-2 py-1 rounded-full">
+                <Users className="w-3 h-3 text-blue-600" />
+                <span className="font-medium">{group.memberCount}</span>
+              </span>
+              <span className="flex items-center gap-1.5 bg-white/60 px-2 py-1 rounded-full">
+                <TrendingUp className="w-3 h-3 text-green-600" />
+                <span className="font-medium">{group.activeMarkets}</span>
+              </span>
+              {group.totalVolume > 0 && (
+                <span className="flex items-center gap-1.5 bg-white/60 px-2 py-1 rounded-full">
+                  <Clock className="w-3 h-3 text-orange-600" />
+                  <span className="font-medium">
+                    {formatVolume(group.totalVolume)}
+                  </span>
+                </span>
               )}
             </div>
-          ))}
-          {group.memberCount > 4 && (
-            <div className="w-8 h-8 bg-gray-100 border-2 border-white rounded-full flex items-center justify-center">
-              <span className="text-xs font-medium text-gray-600">
-                +{group.memberCount - 4}
-              </span>
-            </div>
-          )}
+          </div>
         </div>
-        
-        <button className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
-          View Details →
+      </div>
+
+      <div className="p-4 pt-3">
+        <p className="text-sm text-gray-600 line-clamp-2 mb-4 leading-relaxed">
+          {group.description}
+        </p>
+
+        <div className="text-left mb-4">
+          <span className="text-sm text-gray-600 font-medium">
+            Created {formatDate(group.createdAt)}
+          </span>
+        </div>
+
+        <button
+          onClick={handleClick}
+          className="w-full bg-gray-900 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors cursor-pointer shadow-sm"
+        >
+          View Group Details
         </button>
       </div>
     </div>
