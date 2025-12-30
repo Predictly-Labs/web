@@ -1,74 +1,42 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Upload } from 'lucide-react'
-import { useUploadImagesToPinata } from '@/hooks/useUploadImagesToPinata'
+import { useWallet } from '@/providers/WalletProvider'
+import { useAuth } from '@/hooks/useAuth'
 
 interface OnboardingFormProps {
   walletAddress: string
-  onSubmit: (data: { privyId: string; displayName: string; avatarUrl: string }) => void
+  onSubmit: (data: { signature: string; publicKey: string }) => void
   onDisconnect: () => void
   isLoading: boolean
   error: string | null
 }
 
 export const OnboardingForm = ({ walletAddress, onSubmit, onDisconnect, isLoading, error }: OnboardingFormProps) => {
-  const [privyId, setPrivyId] = useState('')
-  const [displayName, setDisplayName] = useState('')
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const { uploadImages, isUploading } = useUploadImagesToPinata()
+  const [isSigning, setIsSigning] = useState(false)
+  const { signMessage } = useWallet()
+  const { getSignMessage } = useAuth()
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
 
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
-      return
+  const handleSignAndLogin = async () => {
+    try {
+      setIsSigning(true)
+      
+      const { message } = await getSignMessage(walletAddress)
+      
+      const signResult = await signMessage(message)
+      
+      onSubmit({
+        signature: signResult.signature,
+        publicKey: signResult.publicKey
+      })
+    } catch (error) {
+      console.error('Signing failed:', error)
+    } finally {
+      setIsSigning(false)
     }
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB')
-      return
-    }
-
-    setSelectedFile(file)
-    const reader = new FileReader()
-    reader.onload = () => {
-      setPreviewUrl(reader.result as string)
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!privyId.trim() || !displayName.trim()) return
-    
-    let finalAvatarUrl = `https://api.dicebear.com/7.x/shapes/svg?seed=${walletAddress}`
-
-    if (selectedFile) {
-      try {
-        const uploadResults = await uploadImages([selectedFile])
-        if (uploadResults[0]?.success && uploadResults[0]?.url) {
-          finalAvatarUrl = uploadResults[0].url
-        } else {
-          throw new Error('Avatar upload failed')
-        }
-      } catch (uploadError) {
-        console.error('Avatar upload failed:', uploadError)
-        return
-      }
-    }
-    
-    onSubmit({
-      privyId: privyId.trim(),
-      displayName: displayName.trim(),
-      avatarUrl: finalAvatarUrl
-    })
   }
 
   return (
@@ -97,7 +65,7 @@ export const OnboardingForm = ({ walletAddress, onSubmit, onDisconnect, isLoadin
                       className="object-contain"
                     />
                   </div>
-                  <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center">Enter your display name to continue</p>
+                  <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center">Sign message to authenticate</p>
                 </div>
               </div>
             </div>
@@ -161,66 +129,20 @@ export const OnboardingForm = ({ walletAddress, onSubmit, onDisconnect, isLoadin
               </motion.p>
             </div>
 
-            <motion.form 
-              onSubmit={handleSubmit} 
+            <motion.div 
               className="space-y-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              <div>
-                <input
-                  type="text"
-                  value={privyId}
-                  onChange={(e) => setPrivyId(e.target.value)}
-                  placeholder="privyId (e.g., did:privy:test123)"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-300 text-sm placeholder-gray-400"
-                  maxLength={100}
-                  required
-                />
-              </div>
-
-              <div>
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Display Name (e.g., Bang Isal)"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-300 text-sm placeholder-gray-400"
-                  maxLength={50}
-                  required
-                />
-              </div>
-
-              <div className="space-y-3">
-                {previewUrl && (
-                  <div className="flex justify-center">
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200">
-                      <img
-                        src={previewUrl}
-                        alt="Avatar preview"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileSelect}
-                  accept="image/*"
-                  className="hidden"
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  <Upload className="w-4 h-4" />
-                  {isUploading ? 'Uploading...' : selectedFile ? 'Change Avatar' : 'Upload Avatar (optional)'}
-                </button>
+              <div className="text-center py-4">
+                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">Ready to authenticate with your wallet</p>
+                <p className="text-xs text-gray-400">You'll be prompted to sign a message to verify ownership</p>
               </div>
 
               {error && (
@@ -230,13 +152,13 @@ export const OnboardingForm = ({ walletAddress, onSubmit, onDisconnect, isLoadin
               )}
 
               <button
-                type="submit"
-                disabled={isLoading || isUploading || !privyId.trim() || !displayName.trim()}
+                onClick={handleSignAndLogin}
+                disabled={isLoading || isSigning}
                 className="w-full bg-black text-white py-3.5 rounded-xl font-medium hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm cursor-pointer"
               >
-                {isUploading ? 'Uploading Avatar...' : isLoading ? 'Logging in...' : 'Login'}
+                {isSigning ? 'Please sign message...' : isLoading ? 'Authenticating...' : 'Sign & Login'}
               </button>
-            </motion.form>
+            </motion.div>
           </motion.div>
         </div>
       </div>

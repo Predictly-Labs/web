@@ -18,11 +18,20 @@ interface User {
   updatedAt: string
 }
 
+interface WalletMessageResponse {
+  success: boolean
+  data: {
+    message: string
+    nonce: string
+    expiresAt: string
+  }
+}
+
 interface AuthData {
-  privyId: string
   walletAddress: string
-  displayName: string
-  avatarUrl: string
+  signature: string
+  publicKey: string
+  message: string
 }
 
 interface AuthResponse {
@@ -47,6 +56,7 @@ interface AuthContextType {
   token: string | null
   isLoading: boolean
   error: string | null
+  getSignMessage: (walletAddress: string) => Promise<{ message: string; nonce: string }>
   login: (authData: AuthData) => Promise<void>
   logout: () => void
   getProfile: () => Promise<User | null>
@@ -58,7 +68,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
@@ -70,43 +80,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const login = useCallback(async (authData: AuthData): Promise<void> => {
+  const getSignMessage = useCallback(async (walletAddress: string) => {
     setIsLoading(true)
     setError(null)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/auth/privy`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/wallet/message`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(authData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress }),
       })
 
       if (!response.ok) {
-        throw new Error(`Authentication failed: ${response.statusText}`)
+        throw new Error(response.statusText)
       }
 
-      const result: AuthResponse = await response.json()
-      
+      const result: WalletMessageResponse = await response.json()
+
       if (!result.success) {
-        throw new Error(result.message)
+        throw new Error('Failed to get sign message')
+      }
+
+      return {
+        message: result.data.message,
+        nonce: result.data.nonce,
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to get sign message'
+      setError(msg)
+      throw new Error(msg)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  const login = useCallback(async (authData: AuthData) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      // console.log('AuthContext - signature type:', typeof authData.signature)
+      // console.log('AuthContext - signature value:', authData.signature)
+      // console.log('AuthContext - publicKey type:', typeof authData.publicKey)
+      // console.log('AuthContext - publicKey value:', authData.publicKey)
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/wallet/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(authData),
+      })
+
+      const result: AuthResponse = await response.json()
+      // console.log('AuthContext - API Response:', result)
+
+      if (!response.ok || !result.success) {
+        console.error('AuthContext - API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          result
+        })
+        throw new Error(result.message || 'Authentication failed')
       }
 
       setUser(result.data.user)
       setToken(result.data.token)
-    
-      
+
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('authToken', result.data.token)
         sessionStorage.setItem('user', JSON.stringify(result.data.user))
         localStorage.setItem('authToken', result.data.token)
         localStorage.setItem('user', JSON.stringify(result.data.user))
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Authentication failed'
-      setError(errorMessage)
-      throw new Error(errorMessage)
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Authentication failed'
+      setError(msg)
+      throw new Error(msg)
     } finally {
       setIsLoading(false)
     }
@@ -116,7 +164,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null)
     setToken(null)
     setError(null)
-    
+
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('authToken')
       sessionStorage.removeItem('user')
@@ -125,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
-  const getProfile = useCallback(async (): Promise<User | null> => {
+  const getProfile = useCallback(async () => {
     if (!token) return null
 
     setIsLoading(true)
@@ -135,7 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       })
@@ -145,26 +193,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           logout()
           return null
         }
-        throw new Error(`Failed to get profile: ${response.statusText}`)
+        throw new Error(response.statusText)
       }
 
       const result: ProfileResponse = await response.json()
-      
+
       if (!result.success) {
         throw new Error(result.message)
       }
 
       setUser(result.data.user)
-      
+
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('user', JSON.stringify(result.data.user))
         localStorage.setItem('user', JSON.stringify(result.data.user))
       }
 
       return result.data.user
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get profile'
-      setError(errorMessage)
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to get profile'
+      setError(msg)
       return null
     } finally {
       setIsLoading(false)
@@ -172,37 +220,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [token, logout])
 
   const initializeAuth = useCallback(async () => {
-    return new Promise<void>((resolve) => {
-      if (typeof window !== 'undefined') {
-        let storedToken = sessionStorage.getItem('authToken')
-        let storedUser = sessionStorage.getItem('user')
-        
-        if (!storedToken || !storedUser) {
-          storedToken = localStorage.getItem('authToken')
-          storedUser = localStorage.getItem('user')
-        }
-        
-        if (storedToken && storedUser) {
-          try {
-            setToken(storedToken)
-            setUser(JSON.parse(storedUser))
-            
-            if (sessionStorage.getItem('authToken') !== storedToken) {
-              sessionStorage.setItem('authToken', storedToken)
-              sessionStorage.setItem('user', storedUser)
-            }
-          } catch {
-            logout()
-          }
-        } else {
-          console.log('AuthContext - initializeAuth: No stored token/user found')
-        }
+    if (typeof window === 'undefined') return
+
+    let storedToken = sessionStorage.getItem('authToken')
+    let storedUser = sessionStorage.getItem('user')
+
+    if (!storedToken || !storedUser) {
+      storedToken = localStorage.getItem('authToken')
+      storedUser = localStorage.getItem('user')
+    }
+
+    if (storedToken && storedUser) {
+      try {
+        setToken(storedToken)
+        setUser(JSON.parse(storedUser))
+        sessionStorage.setItem('authToken', storedToken)
+        sessionStorage.setItem('user', storedUser)
+      } catch {
+        logout()
       }
-      resolve()
-    })
+    }
   }, [logout])
 
-  // Initialize auth on mount
   useEffect(() => {
     initializeAuth()
   }, [initializeAuth])
@@ -212,6 +251,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     token,
     isLoading,
     error,
+    getSignMessage,
     login,
     logout,
     getProfile,

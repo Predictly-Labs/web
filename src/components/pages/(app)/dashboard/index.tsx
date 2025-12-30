@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 
 export const Dashboard = () => {
   const { connected, address, connect, disconnect } = useWallet();
-  const { user, login, logout, isLoading, error, isAuthenticated, getProfile, initializeAuth, token } = useAuth();
+  const { user, login, logout, isLoading, error, isAuthenticated, getProfile, initializeAuth, token, getSignMessage } = useAuth();
   const [isInitialized, setIsInitialized] = useState(false);
   const [userImageError, setUserImageError] = useState(false);
 
@@ -27,15 +27,19 @@ export const Dashboard = () => {
     }
   };
 
-  const handleOnboardingSubmit = async (data: { privyId: string; displayName: string; avatarUrl: string }) => {
+  const handleOnboardingSubmit = async (data: { signature: string; publicKey: string }) => {
     if (!address) return;
     
     try {
+      const { message } = await getSignMessage(address);
+      console.log('Dashboard - Data received:', data);
+      console.log('Dashboard - Message:', message);
+      
       await login({
-        privyId: data.privyId,
         walletAddress: address,
-        displayName: data.displayName,
-        avatarUrl: data.avatarUrl
+        signature: data.signature,
+        publicKey: data.publicKey,
+        message: message
       });
     } catch (error) {
       console.error('Authentication failed:', error);
