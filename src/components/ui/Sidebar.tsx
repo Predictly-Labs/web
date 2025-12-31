@@ -6,7 +6,8 @@ import { motion } from 'framer-motion';
 import { AiOutlineHome } from 'react-icons/ai';
 import { TbChartCandle } from 'react-icons/tb';
 import { BsPeople } from 'react-icons/bs';
-import { RiGiftLine } from 'react-icons/ri';
+import { MdOutlineWorkspacePremium } from 'react-icons/md';
+import { HiOutlineUser } from 'react-icons/hi2';
 
 interface MenuItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -69,7 +70,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeMenu, onMenuClick }) => {
     { icon: AiOutlineHome, key: 'home', route: '/app/dashboard' },
     { icon: TbChartCandle, key: 'market', route: '/app/create-market' },
     { icon: BsPeople, key: 'groups', route: '/app/groups' },
-    { icon: RiGiftLine, key: 'rewards', route: '/app/rewards' }
+    { icon: MdOutlineWorkspacePremium, key: 'subscriptions', route: '/app/subscriptions' },
+    { icon: HiOutlineUser, key: 'profile', route: '/app/profile' },
   ];
 
   const handleMenuClick = (key: string) => {
