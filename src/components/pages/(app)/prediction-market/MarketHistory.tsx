@@ -180,7 +180,7 @@ const PredictionDetail: React.FC<{
 }> = ({ prediction, onBack, isLoading, onVoteSuccess }) => {
   const [voteAmount, setVoteAmount] = useState<string>('');
   const [selectedVote, setSelectedVote] = useState<'YES' | 'NO' | null>(null);
-  const { placeVote, isPlacing, voteError } = usePlaceVote();
+  const { placeVote, isVoting: isPlacing, voteError } = usePlaceVote();
 
   const handlePlaceVote = async () => {
     if (!selectedVote || !voteAmount || !prediction) {
@@ -194,7 +194,7 @@ const PredictionDetail: React.FC<{
       return;
     }
 
-    const result = await placeVote(prediction.id, selectedVote, amount);
+    const result = await placeVote(prediction.id, { prediction: selectedVote, amount });
     if (result) {
       toast.success(`Successfully placed ${selectedVote} vote for $${amount}`);
       setVoteAmount('');
@@ -427,7 +427,7 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
   onCreateMarket
 }) => {
   const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null);
-  const { prediction, fetchPredictionById, clearPrediction, isLoading, error } = useGetPredictionById();
+  const { prediction, fetchPredictionById, clearPrediction, isLoading } = useGetPredictionById();
   
   const activeMarkets = markets.filter(m => m.status === 'active');
   const closedMarkets = markets.filter(m => m.status === 'closed');
