@@ -106,7 +106,7 @@ export const MyPredictionMarketCard = () => {
                 <h4 className="text-xs font-medium text-gray-900 flex-1">{prediction.title}</h4>
               </div>
               <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(prediction.status)}`}>
-                {prediction.status}
+                {prediction.status?.toLowerCase() === 'active' ? 'Active' : prediction.status}
               </span>
             </div>
             
