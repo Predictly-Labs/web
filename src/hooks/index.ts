@@ -1,5 +1,7 @@
 export { usePredictions } from './usePredictions'
 export { useGetPredictions } from './useGetPredictions'
+export { useGetPredictionsWithPagination } from './useGetPredictionsWithPagination'
+export { usePredictionsFilter } from './usePredictionsFilter'
 export { useCreatePrediction } from './useCreatePrediction'
 export { useGetPredictionById } from './useGetPredictionById'
 export { useGetMyVotes } from './useGetMyVotes'

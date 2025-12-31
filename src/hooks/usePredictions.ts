@@ -3,6 +3,7 @@ import { useAuth } from './useAuth'
 
 interface PredictionMarket {
   id: string
+  onChainId?: string | null
   groupId: string
   title: string
   description: string
@@ -11,8 +12,32 @@ interface PredictionMarket {
   endDate: string
   minStake: number
   maxStake: number
+  status: string
+  outcome?: string | null
+  totalVolume: number
+  yesPool: number
+  noPool: number
+  yesPercentage: number
+  noPercentage: number
+  participantCount: number
+  resolvedById?: string | null
+  resolvedAt?: string | null
+  resolutionNote?: string | null
+  createdById: string
   createdAt: string
   updatedAt: string
+  creator?: {
+    id: string
+    displayName: string
+    avatarUrl: string
+  }
+  group?: {
+    id: string
+    name: string
+  }
+  _count?: {
+    votes: number
+  }
 }
 
 interface CreatePredictionData {
@@ -24,6 +49,13 @@ interface CreatePredictionData {
   endDate: string
   minStake: number
   maxStake: number
+}
+
+interface PredictionsQueryParams {
+  page?: number
+  limit?: number
+  groupId?: string
+  status?: string
 }
 
 interface ApiResponse<T> {
@@ -78,9 +110,22 @@ export const usePredictions = () => {
     }
   }, [getHeaders])
 
-  const getPredictions = useCallback(async (): Promise<PredictionMarket[]> => {
-    return handleRequest<PredictionMarket[]>('/predictions')
-  }, [handleRequest])
+  const buildQueryString = useCallback((params: PredictionsQueryParams): string => {
+    const searchParams = new URLSearchParams()
+    
+    if (params.page) searchParams.append('page', params.page.toString())
+    if (params.limit) searchParams.append('limit', params.limit.toString())
+    if (params.groupId) searchParams.append('groupId', params.groupId)
+    if (params.status) searchParams.append('status', params.status)
+    
+    const queryString = searchParams.toString()
+    return queryString ? `?${queryString}` : ''
+  }, [])
+
+  const getPredictions = useCallback(async (params: PredictionsQueryParams = {}): Promise<PredictionMarket[]> => {
+    const queryString = buildQueryString(params)
+    return handleRequest<PredictionMarket[]>(`/predictions${queryString}`)
+  }, [handleRequest, buildQueryString])
 
   const createPrediction = useCallback(async (
     data: CreatePredictionData

@@ -158,7 +158,7 @@ export const Groups: React.FC<GroupsProps> = ({
 
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-2 border border-gray-100">
           <div
-            className="space-y-8 relative p-6 rounded-3xl overflow-hidden min-h-[calc(100vh-300px)]"
+            className="space-y-8 relative p-6 rounded-3xl overflow-hidden min-h-[calc(100vh-200px)]"
             style={{
               backgroundImage: "url('/assets/main/background/bg-market.png')",
               backgroundSize: "cover",

@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from 'react';
-import { CreateMarketOnboarding } from './CreateMarketOnboarding';
+import React, { useState, useMemo } from 'react';
+import { CreatePredictionForm } from './CreatePredictionForm';
 import { MarketHistory } from './MarketHistory';
 import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
+import { useGetPredictions } from '@/hooks';
 
 interface MarketFormData {
   title: string;
@@ -41,13 +42,39 @@ interface PredictionMarketProps {
 export const PredictionMarket: React.FC<PredictionMarketProps> = ({
   onMarketCreated,
   onMarketClick,
-  markets = []
+  markets: propMarkets = []
 }) => {
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const { predictions, isLoading, error, refetch } = useGetPredictions();
+
+  const markets = useMemo(() => {
+    if (propMarkets.length > 0) return propMarkets;
+
+    return predictions.map(prediction => ({
+      id: prediction.id,
+      title: prediction.title,
+      description: prediction.description,
+      creator: prediction.creator?.displayName || 'User',
+      createdAt: prediction.createdAt,
+      endDate: prediction.endDate,
+      totalPool: prediction.totalVolume || 0,
+      participants: prediction.participantCount || 0,
+      status: prediction.status?.toLowerCase() as 'active' | 'closed' | 'pending',
+      category: prediction.marketType,
+      groupImage: prediction.imageUrl,
+      groupName: prediction.group?.name || 'Unknown Group',
+      creatorAvatar: prediction.creator?.avatarUrl,
+      yesVotes: prediction.yesPool || 0,
+      noVotes: prediction.noPool || 0,
+      yesPercentage: prediction.yesPercentage || 50,
+      noPercentage: prediction.noPercentage || 50
+    }));
+  }, [propMarkets, predictions]);
 
   const handleMarketCreated = (data: MarketFormData) => {
     onMarketCreated?.(data);
     setShowOnboarding(false);
+    refetch();
   };
 
   const handleMarketClick = (market: MarketData) => {
@@ -97,17 +124,36 @@ export const PredictionMarket: React.FC<PredictionMarketProps> = ({
         </div>
 
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-2 border border-gray-100">
-          <MarketHistory 
-            markets={markets}
-            onMarketClick={handleMarketClick}
-            onCreateMarket={handleCreateClick}
-          />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-8 h-8 border-2 border-pink-900 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <p className="text-red-600 text-sm mb-4">Failed to load markets</p>
+              <button
+                onClick={() => refetch()}
+                className="px-4 py-2 bg-pink-900 text-white rounded-lg text-sm hover:bg-pink-800 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <MarketHistory 
+              markets={markets}
+              onMarketClick={handleMarketClick}
+              onCreateMarket={handleCreateClick}
+            />
+          )}
         </div>
 
-        <CreateMarketOnboarding
+        <CreatePredictionForm
           isOpen={showOnboarding}
           onClose={handleCloseOnboarding}
-          onMarketCreated={handleMarketCreated}
+          onSuccess={() => {
+            setShowOnboarding(false);
+            refetch();
+          }}
         />
       </div>
     </div>
