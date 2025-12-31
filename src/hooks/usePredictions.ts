@@ -146,12 +146,17 @@ export const usePredictions = () => {
     return handleRequest<PredictionMarket[]>('/predictions/my-votes')
   }, [handleRequest])
 
+  const getMyCreatedPredictions = useCallback(async (): Promise<PredictionMarket[]> => {
+    return handleRequest<PredictionMarket[]>('/predictions')
+  }, [handleRequest])
+
   return {
     isLoading,
     error,
     getPredictions,
     createPrediction,
     getPredictionById,
-    getMyVotes
+    getMyVotes,
+    getMyCreatedPredictions
   }
 }
