@@ -166,7 +166,7 @@ export const Groups: React.FC<GroupsProps> = ({
               backgroundRepeat: "no-repeat",
             }}
           >
-            <div className="absolute inset-0 bg-white/70"></div>
+            <div className="absolute inset-0 bg-white/70 h-185"></div>
             <div className="relative z-10">
               {selectedGroup ? (
                 isLoadingDetail ? (
