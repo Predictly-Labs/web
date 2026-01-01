@@ -1,54 +1,32 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Users, ArrowLeft, Plus } from "lucide-react";
+import { Users, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { GroupCard } from "./GroupCard";
-import { GroupMarkets } from "./GroupMarkets";
 import { CreateGroupForm } from "./CreateGroupForm";
 import { JoinGroupForm } from "./JoinGroupForm";
 import { useGetGroups } from "@/hooks/useGetGroups";
-import { useGetGroup } from "@/hooks/useGetGroupbyId";
 import Sidebar from "../../../ui/Sidebar";
-import Image from "next/image";
-import { GroupData, ApiGroup, MarketData } from "@/types/group";
+import { GroupData, ApiGroup } from "@/types/group";
 
 interface GroupsProps {
   onGroupClick?: (group: GroupData) => void;
-  onMarketClick?: (market: MarketData) => void;
   groups?: GroupData[];
 }
 
 export const Groups: React.FC<GroupsProps> = ({
   onGroupClick,
-  onMarketClick,
   groups = [],
 }) => {
-  const [selectedGroup, setSelectedGroup] = useState<GroupData | null>(null);
-  const [detailedGroup, setDetailedGroup] = useState<any>(null);
+  const router = useRouter();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showJoinForm, setShowJoinForm] = useState(false);
   const { getGroups, groups: apiGroups, isLoading, error } = useGetGroups();
-  const {
-    getGroup,
-    group: detailedGroupData,
-    isLoading: isLoadingDetail,
-  } = useGetGroup();
 
   useEffect(() => {
     getGroups({ page: 1, limit: 20 });
   }, [getGroups]);
-
-  useEffect(() => {
-    if (selectedGroup) {
-      getGroup(selectedGroup.id);
-    }
-  }, [selectedGroup, getGroup]);
-
-  useEffect(() => {
-    if (detailedGroupData) {
-      setDetailedGroup(detailedGroupData);
-    }
-  }, [detailedGroupData]);
 
   const transformApiGroups = (apiGroups: ApiGroup[]): GroupData[] => {
     return apiGroups.map((group) => {
@@ -93,17 +71,8 @@ export const Groups: React.FC<GroupsProps> = ({
     groups.length > 0 ? groups : transformApiGroups(apiGroups);
 
   const handleGroupClick = (group: GroupData) => {
-    setSelectedGroup(group);
+    router.push(`/app/groups/${group.id}`);
     onGroupClick?.(group);
-  };
-
-  const handleMarketClick = (market: MarketData) => {
-    onMarketClick?.(market);
-  };
-
-  const handleBackToGroups = () => {
-    setSelectedGroup(null);
-    setDetailedGroup(null);
   };
 
   return (
@@ -124,24 +93,14 @@ export const Groups: React.FC<GroupsProps> = ({
               <div className="relative z-10 flex items-center justify-center gap-4 p-2">
                 <div className="flex-1 flex flex-col items-center justify-center">
                   <div className="flex items-center gap-4">
-                    {selectedGroup && (
-                      <button
-                        onClick={handleBackToGroups}
-                        className="p-2 hover:bg-white/20 rounded-xl transition-colors"
-                      >
-                        <ArrowLeft className="w-6 h-6 text-pink-900" />
-                      </button>
-                    )}
                     <div className="flex items-center gap-2">
                       <h1 className="text-2xl font-medium text-pink-900">
-                        {selectedGroup ? selectedGroup.name : "Groups"}
+                        Groups
                       </h1>
                     </div>
                   </div>
                   <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center mt-1">
-                    {selectedGroup
-                      ? "View and manage prediction markets created by this group."
-                      : "Join groups and participate in their prediction markets."}
+                    Join groups and participate in their prediction markets.
                   </p>
                 </div>
               </div>
@@ -159,28 +118,8 @@ export const Groups: React.FC<GroupsProps> = ({
               backgroundRepeat: "no-repeat",
             }}
           >
-            <div className="absolute inset-0 bg-white/70 h-185"></div>
+            <div className="absolute inset-0 bg-white/70 h-192"></div>
             <div className="relative z-10">
-              {selectedGroup ? (
-                isLoadingDetail ? (
-                  <div className="flex items-center justify-center py-20">
-                    <div className="text-gray-500">
-                      Loading group details...
-                    </div>
-                  </div>
-                ) : detailedGroup ? (
-                  <GroupMarkets
-                    group={detailedGroup}
-                    onMarketClick={handleMarketClick}
-                  />
-                ) : (
-                  <div className="flex items-center justify-center py-20">
-                    <div className="text-gray-500">
-                      Loading group details...
-                    </div>
-                  </div>
-                )
-              ) : (
                 <div className="space-y-8">
                   <div className="flex items-center justify-between mb-8">
                     {/* <h2 className="text-2xl font-semibold text-gray-900">All Groups</h2> */}
@@ -247,7 +186,6 @@ export const Groups: React.FC<GroupsProps> = ({
                     </div>
                   )}
                 </div>
-              )}
             </div>
           </div>
         </div>

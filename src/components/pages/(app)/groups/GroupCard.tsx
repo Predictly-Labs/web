@@ -33,8 +33,8 @@ export const GroupCard: React.FC<GroupCardProps> = ({ group, onClick }) => {
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all group overflow-hidden">
-      {/* Header with gradient background */}
-      <div className="bg-linear-to-r from-blue-50 to-purple-50 p-4 pb-3">
+      {/* Header with plain background */}
+      <div className="bg-gray-50 p-4 pb-3">
         <div className="flex items-center gap-3">
           <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 shadow-sm">
             <img
@@ -48,7 +48,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({ group, onClick }) => {
               onError={() => setGroupImageError(true)}
             />
             {group.isPrivate && (
-              <div className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-1 shadow-sm">
+              <div className="absolute -top-1 -right-1 bg-black rounded-full p-1 shadow-sm">
                 <Crown className="w-2.5 h-2.5 text-white" />
               </div>
             )}
@@ -59,17 +59,17 @@ export const GroupCard: React.FC<GroupCardProps> = ({ group, onClick }) => {
               {group.name}
             </h3>
             <div className="flex items-center gap-4 text-xs text-gray-600 mt-1.5">
-              <span className="flex items-center gap-1.5 bg-white/60 px-2 py-1 rounded-full">
-                <Users className="w-3 h-3 text-blue-600" />
+              <span className="flex items-center gap-1.5 bg-white/80 px-2 py-1 rounded-full">
+                <Users className="w-3 h-3 text-black" />
                 <span className="font-medium">{group.memberCount}</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-white/60 px-2 py-1 rounded-full">
-                <TrendingUp className="w-3 h-3 text-green-600" />
+              <span className="flex items-center gap-1.5 bg-white/80 px-2 py-1 rounded-full">
+                <TrendingUp className="w-3 h-3 text-black" />
                 <span className="font-medium">{group.activeMarkets}</span>
               </span>
               {group.totalVolume > 0 && (
-                <span className="flex items-center gap-1.5 bg-white/60 px-2 py-1 rounded-full">
-                  <Clock className="w-3 h-3 text-orange-600" />
+                <span className="flex items-center gap-1.5 bg-white/80 px-2 py-1 rounded-full">
+                  <Clock className="w-3 h-3 text-black" />
                   <span className="font-medium">
                     {formatVolume(group.totalVolume)}
                   </span>

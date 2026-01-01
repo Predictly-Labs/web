@@ -161,7 +161,7 @@ const MarketCard: React.FC<MarketCardProps> = ({ market, onClick }) => {
               />
             </div>
           )}
-          <span className="text-sm text-gray-600">by {market.creator}</span>
+          <span className="text-sm text-gray-600">{market.creator}</span>
         </div>
         <div className="flex items-center gap-1 text-sm font-medium text-gray-900">
           <span>${market.totalPool}</span>
