@@ -130,7 +130,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeMenu, onMenuClick }) => {
           ))}
           
           <motion.div
-            className="absolute w-12 h-12 bg-white/20 rounded-full border-2 border-white/40"
+            className="absolute w-12 h-12"
             animate={{
               y: activeIndex * (48 + 12) // 48px height + 12px gap
             }}

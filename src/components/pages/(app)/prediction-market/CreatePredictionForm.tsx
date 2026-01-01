@@ -8,6 +8,7 @@ import { useCreatePrediction } from '@/hooks/useCreatePrediction'
 import { useGetGroups } from '@/hooks/useGetGroups'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'sonner'
+import { MarketTypeSelection } from './MarketTypeSelection'
 
 interface CreatePredictionFormProps {
   isOpen: boolean
@@ -20,7 +21,7 @@ interface PredictionFormData {
   title: string
   description: string
   imageUrl: string
-  marketType: string
+  marketType: 'STANDARD' | 'NO_LOSS'
   endDate: string
   minStake: number | string
   maxStake: number | string
@@ -74,6 +75,7 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
     }
     reader.readAsDataURL(file)
   }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -277,6 +279,11 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
                 {imageFile ? 'Change Image' : 'Upload Image'}
               </button>
             </div>
+
+            <MarketTypeSelection 
+              selectedType={formData.marketType}
+              onTypeChange={(type) => setFormData(prev => ({ ...prev, marketType: type }))}
+            />
 
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">

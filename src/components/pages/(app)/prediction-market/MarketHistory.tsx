@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Calendar, Users, TrendingUp, Clock, Plus, ArrowLeft } from 'lucide-react';
+import { Calendar, Users, TrendingUp, Clock, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import { useGetPredictionById } from '@/hooks/useGetPredictionById';
-import { usePlaceVote } from '@/hooks/usePlaceVote';
-import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface MarketData {
   id: string;
@@ -64,26 +62,34 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
 };
 
 const MarketCard: React.FC<MarketCardProps> = ({ market, onClick }) => {
+  const router = useRouter();
   const yesVotes = market.yesVotes || 0;
   const noVotes = market.noVotes || 0;
   const yesPercentage = market.yesPercentage || 50;
   const noPercentage = market.noPercentage || 50;
 
+  const handleClick = () => {
+    router.push(`/app/${market.id}`);
+    onClick?.(market);
+  };
+
   return (
     <div 
-      onClick={() => onClick?.(market)}
+      onClick={handleClick}
       className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 transition-all cursor-pointer hover:shadow-lg"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-3 flex-1 pr-3">
           {market.groupImage && (
-            <Image
-              src={market.groupImage}
-              alt="Group"
-              width={40}
-              height={40}
-              className="rounded-full shrink-0"
-            />
+            <div className="w-[40px] h-[40px] rounded-full overflow-hidden bg-gray-200 shrink-0">
+              <Image
+                src={market.groupImage}
+                alt="Group"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
+            </div>
           )}
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
@@ -145,13 +151,15 @@ const MarketCard: React.FC<MarketCardProps> = ({ market, onClick }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {market.creatorAvatar && (
-            <Image
-              src={market.creatorAvatar}
-              alt={market.creator}
-              width={20}
-              height={20}
-              className="rounded-full"
-            />
+            <div className="w-[30px] h-[30px] rounded-full overflow-hidden bg-gray-200 shrink-0">
+              <Image
+                src={market.creatorAvatar}
+                alt={market.creator}
+                width={30}
+                height={30}
+                className="w-full h-full object-cover"
+              />
+            </div>
           )}
           <span className="text-sm text-gray-600">by {market.creator}</span>
         </div>
@@ -172,251 +180,65 @@ const MarketCard: React.FC<MarketCardProps> = ({ market, onClick }) => {
   )
 };
 
-const PredictionDetail: React.FC<{ 
-  prediction: any; 
-  onBack: () => void; 
-  isLoading: boolean;
-  onVoteSuccess?: () => void;
-}> = ({ prediction, onBack, isLoading, onVoteSuccess }) => {
-  const [voteAmount, setVoteAmount] = useState<string>('');
-  const [selectedVote, setSelectedVote] = useState<'YES' | 'NO' | null>(null);
-  const { placeVote, isVoting: isPlacing, voteError } = usePlaceVote();
 
-  const handlePlaceVote = async () => {
-    if (!selectedVote || !voteAmount || !prediction) {
-      toast.error('Please select a vote option and enter an amount');
-      return;
-    }
+interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
 
-    const amount = parseFloat(voteAmount);
-    if (amount < prediction.minStake || amount > prediction.maxStake) {
-      toast.error(`Amount must be between $${prediction.minStake} and $${prediction.maxStake}`);
-      return;
-    }
+const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+  if (totalPages <= 1) return null;
 
-    const result = await placeVote(prediction.id, { prediction: selectedVote, amount });
-    if (result) {
-      toast.success(`Successfully placed ${selectedVote} vote for $${amount}`);
-      setVoteAmount('');
-      setSelectedVote(null);
-      onVoteSuccess?.();
+  const getVisiblePages = () => {
+    const pages = [];
+    const showPages = 5;
+    
+    let start = Math.max(1, currentPage - Math.floor(showPages / 2));
+    let end = Math.min(totalPages, start + showPages - 1);
+    
+    if (end - start + 1 < showPages) {
+      start = Math.max(1, end - showPages + 1);
     }
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
   };
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-pink-900 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (!prediction) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <p className="text-red-600 text-sm mb-4">Failed to load prediction details</p>
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200 transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Markets
-        </button>
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
+    <div className="flex items-center justify-center gap-2 mt-8">
       <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="flex items-center justify-center w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Markets
+        <ChevronLeft className="w-4 h-4 text-gray-600" />
       </button>
-
-      <div className="bg-white rounded-3xl p-8 border border-gray-100">
-        <div className="flex items-start gap-6 mb-8">
-          {prediction.imageUrl && (
-            <Image
-              src={prediction.imageUrl}
-              alt="Market"
-              width={64}
-              height={64}
-              className="rounded-2xl"
-            />
-          )}
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-3">
-              <h1 className="text-3xl font-light text-gray-900">{prediction.title}</h1>
-              <StatusBadge status={prediction.status?.toLowerCase()} />
-            </div>
-            <p className="text-gray-500 text-lg mb-4 leading-relaxed">{prediction.description}</p>
-            {prediction.group && (
-              <div className="text-gray-400 text-sm font-medium">
-                {prediction.group.name}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-12 mb-12">
-          <div>
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-500">Yes</span>
-                <span className="text-2xl font-light text-gray-900">{prediction.yesPercentage}%</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-2">
-                <div 
-                  className="bg-green-500 h-2 rounded-full transition-all duration-500" 
-                  style={{ width: `${prediction.yesPercentage}%` }}
-                ></div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-gray-500">No</span>
-                <span className="text-2xl font-light text-gray-900">{prediction.noPercentage}%</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-2">
-                <div 
-                  className="bg-red-500 h-2 rounded-full transition-all duration-500" 
-                  style={{ width: `${prediction.noPercentage}%` }}
-                ></div>
-              </div>
-
-              <div className="flex justify-between text-sm text-gray-400 pt-4">
-                <span>{prediction.yesPool} votes</span>
-                <span>{prediction.noPool} votes</span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div className="space-y-6 text-sm">
-              <div className="flex justify-between items-center py-2">
-                <span className="text-gray-500">Volume</span>
-                <span className="text-gray-900 font-medium">${prediction.totalVolume}</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-gray-500">Participants</span>
-                <span className="text-gray-900 font-medium">{prediction.participantCount}</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-gray-500">Stake Range</span>
-                <span className="text-gray-900 font-medium">${prediction.minStake} - ${prediction.maxStake}</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-gray-500">Ends</span>
-                <span className="text-gray-900 font-medium">{new Date(prediction.endDate).toLocaleDateString()}</span>
-              </div>
-              {prediction.creator && (
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-500">Creator</span>
-                  <div className="flex items-center gap-2">
-                    {prediction.creator.avatarUrl && (
-                      <Image
-                        src={prediction.creator.avatarUrl}
-                        alt={prediction.creator.displayName}
-                        width={18}
-                        height={18}
-                        className="rounded-full"
-                      />
-                    )}
-                    <span className="text-gray-900 font-medium">{prediction.creator.displayName}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {prediction.status?.toLowerCase() === 'active' && (
-          <div className="border-t border-gray-50 pt-12">
-            <div className="max-w-2xl mx-auto space-y-8">
-              <div className="text-center">
-                <h3 className="text-xl font-light text-gray-900 mb-2">Make Your Prediction</h3>
-                <p className="text-gray-500 text-sm">Choose your stance and stake amount</p>
-              </div>
-              
-              <div className="flex gap-4 justify-center">
-                <button
-                  onClick={() => setSelectedVote('YES')}
-                  className={`px-8 py-4 rounded-2xl transition-all cursor-pointer text-lg font-medium min-w-[120px] ${
-                    selectedVote === 'YES'
-                      ? 'bg-green-500 text-white shadow-lg'
-                      : 'bg-gray-50 text-gray-700 hover:bg-green-50 hover:text-green-600'
-                  }`}
-                >
-                  YES
-                </button>
-                
-                <button
-                  onClick={() => setSelectedVote('NO')}
-                  className={`px-8 py-4 rounded-2xl transition-all cursor-pointer text-lg font-medium min-w-[120px] ${
-                    selectedVote === 'NO'
-                      ? 'bg-red-500 text-white shadow-lg'
-                      : 'bg-gray-50 text-gray-700 hover:bg-red-50 hover:text-red-600'
-                  }`}
-                >
-                  NO
-                </button>
-              </div>
-
-              <div className="max-w-md mx-auto">
-                <div className="flex items-center gap-3 mb-3">
-                  <label htmlFor="voteAmount" className="text-gray-600 text-sm font-medium">
-                    Amount
-                  </label>
-                  <div className="flex items-center gap-1 text-xs text-gray-400">
-                    <Image
-                      src="/assets/logo/logo-coin/move-logo.jpeg"
-                      alt="Move Token"
-                      width={14}
-                      height={14}
-                      className="rounded-full"
-                    />
-                    <span>MOVE</span>
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  id="voteAmount"
-                  value={voteAmount}
-                  onChange={(e) => setVoteAmount(e.target.value)}
-                  step="0.001"
-                  min={prediction.minStake}
-                  max={prediction.maxStake}
-                  placeholder={`${prediction.minStake} - ${prediction.maxStake}`}
-                  className="w-full px-4 py-4 text-center border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-gray-100 focus:border-gray-300 text-lg font-light"
-                />
-              </div>
-
-              <div className="text-center">
-                <button
-                  onClick={handlePlaceVote}
-                  disabled={isPlacing || !selectedVote || !voteAmount}
-                  className={`px-12 py-4 rounded-2xl font-medium transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 text-lg ${
-                    selectedVote === 'YES'
-                      ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl'
-                      : selectedVote === 'NO'
-                      ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl'
-                      : 'bg-gray-200 text-gray-500'
-                  }`}
-                >
-                  {isPlacing ? 'Placing...' : selectedVote ? `Predict ${selectedVote}` : 'Select Prediction'}
-                </button>
-                
-                {voteError && (
-                  <div className="text-red-500 text-sm mt-4">
-                    {voteError}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      
+      {getVisiblePages().map(page => (
+        <button
+          key={page}
+          onClick={() => onPageChange(page)}
+          className={`flex items-center justify-center w-8 h-8 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+            page === currentPage
+              ? 'bg-black text-white'
+              : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+          }`}
+        >
+          {page}
+        </button>
+      ))}
+      
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="flex items-center justify-center w-8 h-8 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+      >
+        <ChevronRight className="w-4 h-4 text-gray-600" />
+      </button>
     </div>
   );
 };
@@ -426,52 +248,30 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
   onMarketClick,
   onCreateMarket
 }) => {
-  const [selectedMarketId, setSelectedMarketId] = useState<string | null>(null);
-  const { prediction, fetchPredictionById, clearPrediction, isLoading } = useGetPredictionById();
+  const [activeCurrentPage, setActiveCurrentPage] = useState(1);
+  const [closedCurrentPage, setClosedCurrentPage] = useState(1);
+  
+  const ITEMS_PER_PAGE = 9;
   
   const activeMarkets = markets.filter(m => m.status === 'active');
   const closedMarkets = markets.filter(m => m.status === 'closed');
+  
+  const activeTotalPages = Math.ceil(activeMarkets.length / ITEMS_PER_PAGE);
+  const closedTotalPages = Math.ceil(closedMarkets.length / ITEMS_PER_PAGE);
+  
+  const getPaginatedMarkets = (marketList: MarketData[], currentPage: number) => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return marketList.slice(startIndex, endIndex);
+  };
+  
+  const paginatedActiveMarkets = getPaginatedMarkets(activeMarkets, activeCurrentPage);
+  const paginatedClosedMarkets = getPaginatedMarkets(closedMarkets, closedCurrentPage);
 
-  const handleMarketClick = async (market: MarketData) => {
-    setSelectedMarketId(market.id);
-    await fetchPredictionById(market.id);
+  const handleMarketClick = (market: MarketData) => {
     onMarketClick?.(market);
   };
 
-  const handleBackToMarkets = () => {
-    setSelectedMarketId(null);
-    clearPrediction();
-  };
-
-  const handleVoteSuccess = async () => {
-    if (selectedMarketId) {
-      await fetchPredictionById(selectedMarketId);
-    }
-  };
-
-  if (selectedMarketId) {
-    return (
-      <div 
-        className="space-y-8 relative p-6 rounded-3xl overflow-hidden min-h-[700px]"
-        style={{
-          backgroundImage: "url('/assets/main/background/bg-market.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <div className="absolute inset-0 bg-white/70"></div>
-        <div className="relative z-10">
-          <PredictionDetail 
-            prediction={prediction} 
-            onBack={handleBackToMarkets} 
-            isLoading={isLoading}
-            onVoteSuccess={handleVoteSuccess}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div 
@@ -483,7 +283,7 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="absolute inset-0 bg-white/70 h-180"></div>
+      <div className="absolute inset-0 bg-white/70 h-234"></div>
       <div className="relative z-10 h-full flex flex-col">
         <div className="flex items-center justify-between mb-8">
           <button
@@ -524,7 +324,7 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
                   Active Markets ({activeMarkets.length})
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {activeMarkets.map(market => (
+                  {paginatedActiveMarkets.map(market => (
                     <MarketCard 
                       key={market.id} 
                       market={market} 
@@ -532,17 +332,22 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
                     />
                   ))}
                 </div>
+                <Pagination 
+                  currentPage={activeCurrentPage}
+                  totalPages={activeTotalPages}
+                  onPageChange={setActiveCurrentPage}
+                />
               </section>
             )}
 
             {closedMarkets.length > 0 && (
               <section>
-                <h3 className="text-lg font-medium text-gray-900 mt-4 flex items-center gap-2">
+                <h3 className="text-lg font-medium text-gray-900 mb-5 flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-gray-500" />
                   Closed Markets ({closedMarkets.length})
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                  {closedMarkets.map(market => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {paginatedClosedMarkets.map(market => (
                     <MarketCard 
                       key={market.id} 
                       market={market} 
@@ -550,6 +355,11 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
                     />
                   ))}
                 </div>
+                <Pagination 
+                  currentPage={closedCurrentPage}
+                  totalPages={closedTotalPages}
+                  onPageChange={setClosedCurrentPage}
+                />
               </section>
             )}
           </div>

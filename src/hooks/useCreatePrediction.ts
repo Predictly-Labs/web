@@ -1,12 +1,13 @@
 import { useState, useCallback } from 'react'
 import { usePredictions } from './usePredictions'
+import { useInitializeMarket } from './useInitializeMarket'
 
 interface CreatePredictionData {
   groupId: string
   title: string
   description: string
   imageUrl: string
-  marketType: string
+  marketType: 'STANDARD' | 'NO_LOSS'
   endDate: string
   minStake: number
   maxStake: number
@@ -17,7 +18,6 @@ interface PredictionMarket {
   groupId: string
   title: string
   description: string
-  imageUrl: string
   marketType: string
   endDate: string
   minStake: number
@@ -30,6 +30,7 @@ export const useCreatePrediction = () => {
   const [isCreating, setIsCreating] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
   const { createPrediction } = usePredictions()
+  const { initializeMarket, isInitializing } = useInitializeMarket()
 
   const handleCreate = useCallback(async (
     data: CreatePredictionData
@@ -38,8 +39,17 @@ export const useCreatePrediction = () => {
     setCreateError(null)
 
     try {
-      const result = await createPrediction(data)
-      return result
+      const createdMarket = await createPrediction(data)
+      
+      if (createdMarket) {
+        const initializeResult = await initializeMarket(createdMarket.id)
+        
+        if (!initializeResult) {
+          console.warn('Market created but initialization failed')
+        }
+      }
+      
+      return createdMarket
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create prediction'
       setCreateError(errorMessage)
@@ -47,11 +57,11 @@ export const useCreatePrediction = () => {
     } finally {
       setIsCreating(false)
     }
-  }, [createPrediction])
+  }, [createPrediction, initializeMarket])
 
   return {
     handleCreate,
-    isCreating,
+    isCreating: isCreating || isInitializing,
     createError
   }
 }

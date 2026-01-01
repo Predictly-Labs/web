@@ -40,12 +40,14 @@ interface PredictionMarket {
   }
 }
 
+type MarketType = 'STANDARD' | 'NO_LOSS'
+
 interface CreatePredictionData {
   groupId: string
   title: string
   description: string
   imageUrl: string
-  marketType: string
+  marketType: MarketType
   endDate: string
   minStake: number
   maxStake: number
