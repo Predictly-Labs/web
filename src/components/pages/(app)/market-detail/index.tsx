@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Lottie from 'lottie-react'
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { useGetPredictionById } from '@/hooks/useGetPredictionById'
 import { usePlaceVote } from '@/hooks/usePlaceVote'
@@ -102,6 +103,107 @@ const MarketTypeBadge = ({ marketType }: MarketTypeBadgeProps) => {
   )
 }
 
+interface AnimatedYieldProps {
+  targetYield: number
+}
+
+const AnimatedYield = ({ targetYield }: AnimatedYieldProps) => {
+  const count = useMotionValue(0)
+  const rounded = useTransform(count, latest => latest.toFixed(4))
+  const [displayValue, setDisplayValue] = useState('0.0000')
+
+  useEffect(() => {
+    const controls = animate(count, targetYield, {
+      duration: 2,
+      ease: 'easeOut',
+      onUpdate: (latest) => {
+        setDisplayValue(latest.toFixed(4))
+      }
+    })
+    return controls.stop
+  }, [count, targetYield])
+
+  return (
+    <motion.span 
+      className="text-gray-900 font-medium"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {displayValue}%
+    </motion.span>
+  )
+}
+
+const LiveYieldCounter = () => {
+  const [currentYield, setCurrentYield] = useState(0.0001)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentYield(prev => {
+        const increment = Math.random() * 0.000005 + 0.000001
+        return prev + increment
+      })
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <motion.div
+      className="flex justify-between items-center py-2 border-t border-gray-100"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+    >
+      <span className="text-gray-500">Live Yield</span>
+      <motion.span 
+        className="text-green-600 font-medium"
+        key={currentYield}
+        initial={{ scale: 1.1 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.2 }}
+      >
+        +{currentYield.toFixed(6)}%
+      </motion.span>
+    </motion.div>
+  )
+}
+
+interface DefiProtocolDisplayProps {
+  protocols: Array<{ name: string; logo: string }>
+}
+
+const DefiProtocolDisplay = ({ protocols }: DefiProtocolDisplayProps) => {
+  return (
+    <div className="flex flex-col gap-3 mt-4 pt-3 border-t border-gray-100">
+      <span className="text-gray-500 text-sm">Supported DeFi Protocols</span>
+      <div className="flex flex-wrap gap-3">
+        {protocols.map((protocol, index) => (
+          <motion.div
+            key={protocol.name}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+          >
+            <div className="w-6 h-6 rounded-full overflow-hidden bg-white border border-gray-200">
+              <Image
+                src={protocol.logo}
+                alt={protocol.name}
+                width={24}
+                height={24}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-sm font-medium text-gray-700">{protocol.name}</span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export const MarketDetail = ({ marketId }: MarketDetailProps) => {
   const router = useRouter()
   const { user } = useAuth()
@@ -109,6 +211,14 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
   const { placeVote, isVoting, voteError } = usePlaceVote()
   const [voteAmount, setVoteAmount] = useState<string>('')
   const [selectedVote, setSelectedVote] = useState<'YES' | 'NO' | null>(null)
+
+  const defiProtocols = [
+    { name: 'Canopy', logo: '/assets/logo/defi-protocol-logo/Canopy.jpg' },
+    { name: 'Layer Bank', logo: '/assets/logo/defi-protocol-logo/Layer Bank.jpg' },
+    { name: 'MovePosition', logo: '/assets/logo/defi-protocol-logo/MovePosition.jpg' }
+  ]
+
+  const calculatedYield = 12.5687
 
   useEffect(() => {
     if (marketId) {
@@ -306,6 +416,15 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
                     <span className="text-gray-500">Market Type</span>
                     <MarketTypeBadge marketType={prediction.marketType} />
                   </div>
+                  {prediction.marketType?.toUpperCase() === 'NO_LOSS' && (
+                    <>
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-gray-500">Calculated Yield</span>
+                        <AnimatedYield targetYield={calculatedYield} />
+                      </div>
+                      <LiveYieldCounter />
+                    </>
+                  )}
                   {prediction.creator && (
                     <div className="flex justify-between items-center py-2">
                       <span className="text-gray-500">Creator</span>
@@ -326,6 +445,9 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
                     </div>
                   )}
                 </div>
+                {prediction.marketType?.toUpperCase() === 'NO_LOSS' && (
+                  <DefiProtocolDisplay protocols={defiProtocols} />
+                )}
               </div>
             </div>
 
