@@ -6,6 +6,7 @@ import Sidebar from "@/components/ui/Sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { useGetUserStats } from "@/hooks/useGetUserStats";
 import { useGetMyGroups } from "@/hooks/useGetMyGroups";
+import { useGetMyVotes } from "@/hooks/useGetMyVotes";
 import { BsSearch, BsPencil } from "react-icons/bs";
 
 interface ActivityData {
@@ -27,6 +28,7 @@ export const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const { userStats, fetchUserStats, isLoading } = useGetUserStats();
   const { getMyGroups, groups, isLoading: isLoadingGroups } = useGetMyGroups();
+  const { myVotes, isLoading: isLoadingVotes, fetchMyVotes } = useGetMyVotes();
   const [activeTab, setActiveTab] = useState<"positions" | "activity">(
     "positions"
   );
@@ -45,8 +47,9 @@ export const ProfilePage: React.FC = () => {
     if (user?.id) {
       fetchUserStats(user.id);
       getMyGroups({ limit: 3 });
+      fetchMyVotes({ page: 1, limit: 20 });
     }
-  }, [user, fetchUserStats, getMyGroups]);
+  }, [user, fetchUserStats, getMyGroups, fetchMyVotes]);
 
   useEffect(() => {
     if (userStats) {
@@ -57,6 +60,22 @@ export const ProfilePage: React.FC = () => {
   const formatWalletAddress = (address: string) => {
     if (!address) return "";
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
+  };
+
+  const getFilteredVotes = () => {
+    return myVotes.filter(vote => {
+      if (activeFilter === 'active') {
+        return vote.market.status.toLowerCase() === 'active';
+      } else {
+        return vote.market.status.toLowerCase() === 'closed';
+      }
+    });
+  };
+
+  const getStatusColor = (prediction: 'YES' | 'NO') => {
+    return prediction === 'YES' 
+      ? 'text-green-600 bg-green-100' 
+      : 'text-red-600 bg-red-100';
   };
 
   const maxValue = Math.max(...activityData.map((d) => d.value));
@@ -254,27 +273,157 @@ export const ProfilePage: React.FC = () => {
                       </div>
 
                       <div className="border border-gray-200 rounded-lg overflow-hidden">
-                        <div className="grid grid-cols-4 gap-4 px-6 py-3 bg-gray-50 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        <div className="grid grid-cols-5 gap-4 px-6 py-3 bg-gray-50 text-xs font-medium text-gray-700 uppercase tracking-wider">
                           <div>Market</div>
-                          <div className="text-right">Avg</div>
-                          <div className="text-right">Current</div>
-                          <div className="text-right">Value</div>
+                          <div className="text-right">Prediction</div>
+                          <div className="text-right">Amount</div>
+                          <div className="text-right">Date</div>
+                          <div className="text-right">Group</div>
                         </div>
 
-                        <div className="p-8 text-center bg-white">
-                          <div className="text-gray-500 text-sm">
-                            No positions found
+                        {isLoadingVotes ? (
+                          <div className="p-8 text-center bg-white">
+                            <div className="text-gray-500 text-sm">
+                              Loading positions...
+                            </div>
                           </div>
-                        </div>
+                        ) : getFilteredVotes().length === 0 ? (
+                          <div className="p-8 text-center bg-white">
+                            <div className="text-gray-500 text-sm">
+                              No {activeFilter} positions found
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-gray-100">
+                            {getFilteredVotes().map((vote) => (
+                              <div key={vote.id} className="grid grid-cols-5 gap-4 px-6 py-4 bg-white hover:bg-gray-50 transition-colors">
+                                <div className="flex items-center gap-3">
+                                  {vote.market.imageUrl && (
+                                    <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-200">
+                                      <Image
+                                        src={vote.market.imageUrl}
+                                        alt={vote.market.title}
+                                        width={32}
+                                        height={32}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                  )}
+                                  <div>
+                                    <div className="text-sm font-medium text-gray-900 line-clamp-1">
+                                      {vote.market.title}
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                      {vote.market.marketType}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="text-right">
+                                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(vote.prediction)}`}>
+                                    {vote.prediction}
+                                  </span>
+                                </div>
+                                
+                                <div className="text-right">
+                                  <div className="flex items-center justify-end gap-1">
+                                    <Image
+                                      src="/assets/logo/logo-coin/move-logo.jpeg"
+                                      alt="Move Token"
+                                      width={12}
+                                      height={12}
+                                      className="rounded-full"
+                                    />
+                                    <span className="text-sm font-medium text-gray-900">
+                                      {vote.amount}
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                <div className="text-right">
+                                  <div className="text-sm text-gray-900">
+                                    {new Date(vote.createdAt).toLocaleDateString()}
+                                  </div>
+                                </div>
+                                
+                                <div className="text-right">
+                                  <div className="text-sm text-gray-500">
+                                    {vote.market.group?.name || 'No Group'}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </>
                   )}
 
                   {activeTab === "activity" && (
-                    <div className="p-8 text-center">
-                      <div className="text-gray-500 text-sm">
-                        Activity data will be shown here
+                    <div>
+                      <div className="mb-6">
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
                       </div>
+                      
+                      {isLoadingVotes ? (
+                        <div className="p-8 text-center">
+                          <div className="text-gray-500 text-sm">
+                            Loading activity...
+                          </div>
+                        </div>
+                      ) : myVotes.length === 0 ? (
+                        <div className="p-8 text-center">
+                          <div className="text-gray-500 text-sm">
+                            No activity found
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {myVotes.slice(0, 10).map((vote) => (
+                            <div key={vote.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                              <div className="flex-shrink-0">
+                                {vote.market.imageUrl && (
+                                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-200">
+                                    <Image
+                                      src={vote.market.imageUrl}
+                                      alt={vote.market.title}
+                                      width={48}
+                                      height={48}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium text-gray-900 line-clamp-1">
+                                  Placed {vote.prediction} vote on "{vote.market.title}"
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {vote.market.group?.name && `in ${vote.market.group.name} • `}
+                                  {new Date(vote.createdAt).toLocaleString()}
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1 text-sm font-medium text-gray-900">
+                                  <Image
+                                    src="/assets/logo/logo-coin/move-logo.jpeg"
+                                    alt="Move Token"
+                                    width={14}
+                                    height={14}
+                                    className="rounded-full"
+                                  />
+                                  {vote.amount}
+                                </div>
+                                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(vote.prediction)}`}>
+                                  {vote.prediction}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
