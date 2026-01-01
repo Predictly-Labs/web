@@ -136,13 +136,6 @@ export const Groups: React.FC<GroupsProps> = ({
                       <h1 className="text-2xl font-medium text-pink-900">
                         {selectedGroup ? selectedGroup.name : "Groups"}
                       </h1>
-                      <Image
-                        src="/assets/main/icon/groups-icon.png"
-                        alt="Groups Icon"
-                        width={30}
-                        height={30}
-                        className="object-contain"
-                      />
                     </div>
                   </div>
                   <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center mt-1">

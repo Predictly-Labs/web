@@ -2,18 +2,18 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
-import { useGetGroups } from "@/hooks/useGetGroups";
+import { useGetMyGroups } from "@/hooks/useGetMyGroups";
 import { useAuth } from "@/hooks/useAuth";
 
 export const GroupCard = () => {
   const { user } = useAuth();
-  const { getGroups, groups, isLoading } = useGetGroups();
+  const { getMyGroups, groups, isLoading } = useGetMyGroups();
 
   useEffect(() => {
     if (user?.id) {
-      getGroups({ limit: 3 });
+      getMyGroups({ limit: 3 });
     }
-  }, [user, getGroups]);
+  }, [user, getMyGroups]);
 
   return (
     <div

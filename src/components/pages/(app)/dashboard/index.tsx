@@ -117,13 +117,6 @@ export const Dashboard = () => {
                     <div className="flex flex-col items-center">
                       <div className="flex items-center gap-2 mb-1">
                         <h1 className="text-2xl font-medium text-pink-900">My Dashboard</h1>
-                        <Image
-                          src="/assets/main/icon/dashboard-icon.png"
-                          alt="Dashboard Icon"
-                          width={30}
-                          height={30}
-                          className="object-contain"
-                        />
                       </div>
                       <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center">Welcome back! Here's what's happening with your predictions.</p>
                     </div>
@@ -233,13 +226,6 @@ export const Dashboard = () => {
                   <div className="flex flex-col items-center justify-center">
                     <div className="flex items-center gap-2 mb-1">
                       <h1 className="text-2xl font-medium text-pink-900">My Dashboard</h1>
-                      <Image
-                        src="/assets/main/icon/dashboard-icon.png"
-                        alt="Dashboard Icon"
-                        width={30}
-                        height={30}
-                        className="object-contain"
-                      />
                     </div>
                     <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center">Connect your wallet to start predicting</p>
                   </div>
@@ -302,13 +288,6 @@ export const Dashboard = () => {
                   <div className="flex flex-col items-center">
                     <div className="flex items-center gap-2 mb-1">
                       <h1 className="text-2xl font-medium text-pink-900">My Dashboard</h1>
-                      <Image
-                        src="/assets/main/icon/dashboard-icon.png"
-                        alt="Dashboard Icon"
-                        width={30}
-                        height={30}
-                        className="object-contain"
-                      />
                     </div>
                     <p className="text-sm sm:text-base lg:text-md text-gray-500 text-center">Welcome back! Here's what's happening with your predictions.</p>
                   </div>

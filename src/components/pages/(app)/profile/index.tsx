@@ -5,7 +5,7 @@ import Image from "next/image";
 import Sidebar from "@/components/ui/Sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { useGetUserStats } from "@/hooks/useGetUserStats";
-import { useGetGroups } from "@/hooks/useGetGroups";
+import { useGetMyGroups } from "@/hooks/useGetMyGroups";
 import { BsSearch, BsPencil } from "react-icons/bs";
 
 interface ActivityData {
@@ -26,7 +26,7 @@ const activityData: ActivityData[] = [
 export const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const { userStats, fetchUserStats, isLoading } = useGetUserStats();
-  const { getGroups, groups, isLoading: isLoadingGroups } = useGetGroups();
+  const { getMyGroups, groups, isLoading: isLoadingGroups } = useGetMyGroups();
   const [activeTab, setActiveTab] = useState<"positions" | "activity">(
     "positions"
   );
@@ -44,9 +44,9 @@ export const ProfilePage: React.FC = () => {
   useEffect(() => {
     if (user?.id) {
       fetchUserStats(user.id);
-      getGroups({ limit: 3 });
+      getMyGroups({ limit: 3 });
     }
-  }, [user, fetchUserStats, getGroups]);
+  }, [user, fetchUserStats, getMyGroups]);
 
   useEffect(() => {
     if (userStats) {
@@ -79,7 +79,7 @@ export const ProfilePage: React.FC = () => {
               <div className="relative z-10 flex items-center justify-center gap-4 p-6">
                 <div className="flex-1 flex flex-col items-center justify-center">
                   <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-3xl font-light text-pink-900">
+                    <h1 className="text-3xl font-medium text-pink-900">
                       Profile
                     </h1>
                   </div>
