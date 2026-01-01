@@ -1,26 +1,18 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useGetUserStats } from '@/hooks/useGetUserStats';
+import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useGetMyVotesStats } from '@/hooks/useGetMyVotesStats';
 
 export const ActivityCard = () => {
   const { user } = useAuth();
-  const { userStats, fetchUserStats, isLoading } = useGetUserStats();
-  const [totalPredictions, setTotalPredictions] = useState(47);
+  const { stats, fetchMyVotesStats, isLoading } = useGetMyVotesStats();
 
   useEffect(() => {
-    const loadUserStats = async () => {
-      if (user?.id) {
-        const stats = await fetchUserStats(user.id);
-        if (stats) {
-          setTotalPredictions(stats.totalPredictions);
-        }
-      }
-    };
-
-    loadUserStats();
-  }, [user, fetchUserStats]);
+    if (user?.id) {
+      fetchMyVotesStats();
+    }
+  }, [user, fetchMyVotesStats]);
 
   const weekData = [
     { day: "Mon", value: 35 },
@@ -63,7 +55,7 @@ export const ActivityCard = () => {
         <div>
           <p className="text-gray-500 text-sm mb-2">Predictions this week</p>
           <div className="flex items-end gap-3">
-            <h2 className="text-4xl font-bold text-gray-900">{isLoading ? '...' : totalPredictions}</h2>
+            <h2 className="text-4xl font-bold text-gray-900">{isLoading ? '...' : stats?.totalVotes || 0}</h2>
             <span className="text-lg text-gray-400 mb-1">Activity</span>
             <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-1">
               +23%

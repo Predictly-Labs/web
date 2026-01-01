@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGetUserStats } from "@/hooks/useGetUserStats";
 import { useGetMyGroups } from "@/hooks/useGetMyGroups";
 import { useGetMyVotes } from "@/hooks/useGetMyVotes";
+import { useGetMyVotesStats } from "@/hooks/useGetMyVotesStats";
 import { BsSearch, BsPencil } from "react-icons/bs";
 
 interface ActivityData {
@@ -26,9 +27,10 @@ const activityData: ActivityData[] = [
 
 export const ProfilePage: React.FC = () => {
   const { user } = useAuth();
-  const { userStats, fetchUserStats, isLoading } = useGetUserStats();
+  const { userStats, fetchUserStats } = useGetUserStats();
   const { getMyGroups, groups, isLoading: isLoadingGroups } = useGetMyGroups();
   const { myVotes, isLoading: isLoadingVotes, fetchMyVotes } = useGetMyVotes();
+  const { stats: votesStats, fetchMyVotesStats, isLoading: isLoadingStats } = useGetMyVotesStats();
   const [activeTab, setActiveTab] = useState<"positions" | "activity">(
     "positions"
   );
@@ -48,14 +50,23 @@ export const ProfilePage: React.FC = () => {
       fetchUserStats(user.id);
       getMyGroups({ limit: 3 });
       fetchMyVotes({ page: 1, limit: 20 });
+      fetchMyVotesStats();
     }
-  }, [user, fetchUserStats, getMyGroups, fetchMyVotes]);
+  }, [user, fetchUserStats, getMyGroups, fetchMyVotes, fetchMyVotesStats]);
 
   useEffect(() => {
     if (userStats) {
-      setStats(userStats);
+      setStats({
+        ...userStats,
+        totalPredictions: user?.totalPredictions || userStats.totalPredictions || 0
+      });
+    } else if (user) {
+      setStats(prev => ({
+        ...prev,
+        totalPredictions: user.totalPredictions
+      }));
     }
-  }, [userStats]);
+  }, [userStats, user]);
 
   const formatWalletAddress = (address: string) => {
     if (!address) return "";
@@ -112,7 +123,7 @@ export const ProfilePage: React.FC = () => {
         </div>
 
         <div
-          className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-4 border-white h-180"
+          className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-4 border-white h-195"
           style={{
             backgroundImage: "url('/assets/main/background/bg-market.png')",
             backgroundSize: "cover",
@@ -157,7 +168,7 @@ export const ProfilePage: React.FC = () => {
                               { month: "short", year: "numeric" }
                             )
                           : "Unknown"}{" "}
-                        • {stats.totalPredictions || 0} predictions
+                        • {votesStats?.totalVotes || stats.totalPredictions || 0} predictions
                       </div>
                       <div className="w-[45%]">
                         <div className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
@@ -174,30 +185,85 @@ export const ProfilePage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-8">
+                <div className="grid grid-cols-4 gap-6">
                   <div>
                     <div className="text-sm text-gray-500 mb-1">
-                      Positions Value
+                      Total Invested
                     </div>
-                    <div className="text-2xl font-light text-gray-900">
-                      $
-                      {isLoading
-                        ? "..."
-                        : stats.totalEarnings?.toFixed(2) || "0.00"}
+                    <div className="flex items-center gap-1 text-2xl font-light text-gray-900">
+                      <Image
+                        src="/assets/logo/logo-coin/move-logo.jpeg"
+                        alt="Move Token"
+                        width={20}
+                        height={20}
+                        className="rounded-full"
+                      />
+                      {isLoadingStats ? "..." : votesStats?.totalInvested?.toFixed(2) || "0.00"}
                     </div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-500 mb-1">
-                      Biggest Win
+                      Total Earnings
                     </div>
-                    <div className="text-2xl font-light text-gray-900">—</div>
+                    <div className="flex items-center gap-1 text-2xl font-light text-gray-900">
+                      <Image
+                        src="/assets/logo/logo-coin/move-logo.jpeg"
+                        alt="Move Token"
+                        width={20}
+                        height={20}
+                        className="rounded-full"
+                      />
+                      {isLoadingStats ? "..." : votesStats?.totalEarnings?.toFixed(2) || "0.00"}
+                    </div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-500 mb-1">
-                      Predictions
+                      ROI
+                    </div>
+                    <div className={`text-2xl font-light ${(votesStats?.roi || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {isLoadingStats ? "..." : `${((votesStats?.roi || 0) * 100).toFixed(1)}%`}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">
+                      Win Rate
                     </div>
                     <div className="text-2xl font-light text-gray-900">
-                      {isLoading ? "..." : stats.totalPredictions || 0}
+                      {isLoadingStats ? "..." : `${((votesStats?.winRate || 0) * 100).toFixed(1)}%`}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-6 mt-6">
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">
+                      Active Votes
+                    </div>
+                    <div className="text-lg font-light text-gray-900">
+                      {isLoadingStats ? "..." : votesStats?.activeVotes || 0}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">
+                      Won / Lost
+                    </div>
+                    <div className="text-lg font-light text-gray-900">
+                      {isLoadingStats ? "..." : `${votesStats?.wonVotes || 0} / ${votesStats?.lostVotes || 0}`}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">
+                      Avg Stake
+                    </div>
+                    <div className="flex items-center gap-1 text-lg font-light text-gray-900">
+                      <Image
+                        src="/assets/logo/logo-coin/move-logo.jpeg"
+                        alt="Move Token"
+                        width={16}
+                        height={16}
+                        className="rounded-full"
+                      />
+                      {isLoadingStats ? "..." : votesStats?.averageStake?.toFixed(2) || "0.00"}
                     </div>
                   </div>
                 </div>
@@ -273,12 +339,11 @@ export const ProfilePage: React.FC = () => {
                       </div>
 
                       <div className="border border-gray-200 rounded-lg overflow-hidden">
-                        <div className="grid grid-cols-5 gap-4 px-6 py-3 bg-gray-50 text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        <div className="grid grid-cols-4 gap-4 px-6 py-3 bg-gray-50 text-xs font-medium text-gray-700 uppercase tracking-wider">
                           <div>Market</div>
                           <div className="text-right">Prediction</div>
                           <div className="text-right">Amount</div>
                           <div className="text-right">Date</div>
-                          <div className="text-right">Group</div>
                         </div>
 
                         {isLoadingVotes ? (
@@ -296,7 +361,7 @@ export const ProfilePage: React.FC = () => {
                         ) : (
                           <div className="divide-y divide-gray-100">
                             {getFilteredVotes().map((vote) => (
-                              <div key={vote.id} className="grid grid-cols-5 gap-4 px-6 py-4 bg-white hover:bg-gray-50 transition-colors">
+                              <div key={vote.id} className="grid grid-cols-4 gap-4 px-6 py-4 bg-white hover:bg-gray-50 transition-colors">
                                 <div className="flex items-center gap-3">
                                   {vote.market.imageUrl && (
                                     <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-200">
@@ -345,12 +410,7 @@ export const ProfilePage: React.FC = () => {
                                     {new Date(vote.createdAt).toLocaleDateString()}
                                   </div>
                                 </div>
-                                
-                                <div className="text-right">
-                                  <div className="text-sm text-gray-500">
-                                    {vote.market.group?.name || 'No Group'}
-                                  </div>
-                                </div>
+
                               </div>
                             ))}
                           </div>
@@ -472,7 +532,7 @@ export const ProfilePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 mt-6">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 mt-6">
                 <h3 className="text-sm text-gray-500 mb-4">My Groups</h3>
                 {isLoadingGroups ? (
                   <div className="flex items-center justify-center py-4">
@@ -483,36 +543,45 @@ export const ProfilePage: React.FC = () => {
                     <div className="text-gray-500 text-xs">No groups found</div>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {groups.slice(0, 3).map((group) => (
-                      <div key={group.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="relative w-8 h-8">
-                          {group.iconUrl ? (
-                            <Image
-                              src={group.iconUrl}
-                              alt={group.name}
-                              fill
-                              className="rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                              <span className="text-gray-600 text-xs font-medium">
-                                {group.name.charAt(0).toUpperCase()}
-                              </span>
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
+                      {groups.slice(0, 3).map((group) => (
+                        <div key={group.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                          <div className="relative w-10 h-10 sm:w-8 sm:h-8 shrink-0">
+                            {group.iconUrl ? (
+                              <Image
+                                src={group.iconUrl}
+                                alt={group.name}
+                                fill
+                                className="rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gray-300 rounded-full flex items-center justify-center">
+                                <span className="text-gray-600 text-xs font-medium">
+                                  {group.name.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-gray-900 truncate">
+                              {group.name}
                             </div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900 truncate">
-                            {group.name}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {group.stats.memberCount} members
+                            <div className="text-xs text-gray-500">
+                              {group.stats.memberCount} member{group.stats.memberCount !== 1 ? 's' : ''}
+                            </div>
                           </div>
                         </div>
+                      ))}
+                    </div>
+                    {groups.length > 3 && (
+                      <div className="mt-4 pt-3 border-t border-gray-100">
+                        <button className="text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">
+                          View all groups ({groups.length})
+                        </button>
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
