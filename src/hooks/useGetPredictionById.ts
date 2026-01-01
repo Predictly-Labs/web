@@ -38,6 +38,28 @@ interface PredictionMarket {
   _count?: {
     votes: number
   }
+  votes?: Array<{
+    id: string
+    onChainTxHash?: string | null
+    marketId: string
+    userId: string
+    prediction: 'YES' | 'NO'
+    amount: number
+    hasClaimedReward: boolean
+    rewardAmount?: number | null
+    createdAt: string
+    user: {
+      id: string
+      displayName: string
+      avatarUrl: string
+    }
+  }>
+  userVote?: {
+    id: string
+    prediction: 'YES' | 'NO'
+    amount: number
+    createdAt: string
+  } | null
 }
 
 export const useGetPredictionById = () => {

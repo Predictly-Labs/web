@@ -157,15 +157,24 @@ const LiveYieldCounter = () => {
       transition={{ duration: 0.5, delay: 0.3 }}
     >
       <span className="text-gray-500">Live Yield</span>
-      <motion.span 
-        className="text-green-600 font-medium"
-        key={currentYield}
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.2 }}
-      >
-        +{currentYield.toFixed(6)}%
-      </motion.span>
+      <div className="flex items-center gap-1">
+        <motion.span 
+          className="text-green-600 font-medium"
+          key={currentYield}
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.2 }}
+        >
+          +{currentYield.toFixed(6)}
+        </motion.span>
+        <Image
+          src="/assets/logo/logo-coin/move-logo.jpeg"
+          alt="Move Token"
+          width={14}
+          height={14}
+          className="rounded-full"
+        />
+      </div>
     </motion.div>
   )
 }
@@ -204,6 +213,94 @@ const DefiProtocolDisplay = ({ protocols }: DefiProtocolDisplayProps) => {
   )
 }
 
+interface VotesListProps {
+  votes: Array<{
+    id: string
+    prediction: 'YES' | 'NO'
+    amount: number
+    createdAt: string
+    user: {
+      id: string
+      displayName: string
+      avatarUrl: string
+    }
+  }>
+  groupName?: string
+}
+
+const VotesList = ({ votes, groupName }: VotesListProps) => {
+  if (!votes || votes.length === 0) return null
+
+  return (
+    <motion.div 
+      className="mt-8 pt-6 border-t border-gray-100"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="flex items-center gap-2 mb-4">
+        <h3 className="text-lg font-medium text-gray-900">Recent Votes</h3>
+        {groupName && (
+          <span className="text-sm text-gray-500">from {groupName}</span>
+        )}
+      </div>
+      <div className="space-y-3 max-h-80 overflow-y-auto">
+        {votes.map((vote, index) => (
+          <motion.div
+            key={vote.id}
+            className="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
+                <Image
+                  src={vote.user.avatarUrl}
+                  alt={vote.user.displayName}
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-gray-900">
+                  {vote.user.displayName}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {new Date(vote.createdAt).toLocaleDateString()}
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 text-sm text-gray-600">
+                <Image
+                  src="/assets/logo/logo-coin/move-logo.jpeg"
+                  alt="Move Token"
+                  width={12}
+                  height={12}
+                  className="rounded-full"
+                />
+                {vote.amount}
+              </div>
+              <div 
+                className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  vote.prediction === 'YES' 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-red-100 text-red-700'
+                }`}
+              >
+                {vote.prediction}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
 export const MarketDetail = ({ marketId }: MarketDetailProps) => {
   const router = useRouter()
   const { user } = useAuth()
@@ -238,13 +335,13 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
 
     const amount = parseFloat(voteAmount)
     if (amount < prediction.minStake || amount > prediction.maxStake) {
-      toast.error(`Amount must be between $${prediction.minStake} and $${prediction.maxStake}`)
+      toast.error(`Amount must be between ${prediction.minStake} and ${prediction.maxStake} MOVE`)
       return
     }
 
     const result = await placeVote(prediction.id, { prediction: selectedVote, amount })
     if (result) {
-      toast.success(`Successfully placed ${selectedVote} vote for $${amount}`)
+      toast.success(`Successfully placed ${selectedVote} vote for ${amount} MOVE`)
       setVoteAmount('')
       setSelectedVote(null)
       fetchPredictionById(marketId)
@@ -398,7 +495,16 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
                 <div className="space-y-6 text-sm">
                   <div className="flex justify-between items-center py-2">
                     <span className="text-gray-500">Volume</span>
-                    <span className="text-gray-900 font-medium">${prediction.totalVolume}</span>
+                    <div className="flex items-center gap-1">
+                      <Image
+                        src="/assets/logo/logo-coin/move-logo.jpeg"
+                        alt="Move Token"
+                        width={14}
+                        height={14}
+                        className="rounded-full"
+                      />
+                      <span className="text-gray-900 font-medium">{prediction.totalVolume}</span>
+                    </div>
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <span className="text-gray-500">Participants</span>
@@ -406,7 +512,16 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <span className="text-gray-500">Stake Range</span>
-                    <span className="text-gray-900 font-medium">${prediction.minStake} - ${prediction.maxStake}</span>
+                    <div className="flex items-center gap-1">
+                      <Image
+                        src="/assets/logo/logo-coin/move-logo.jpeg"
+                        alt="Move Token"
+                        width={14}
+                        height={14}
+                        className="rounded-full"
+                      />
+                      <span className="text-gray-900 font-medium">{prediction.minStake} - {prediction.maxStake}</span>
+                    </div>
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <span className="text-gray-500">End Date</span>
@@ -447,6 +562,10 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
                 </div>
                 {prediction.marketType?.toUpperCase() === 'NO_LOSS' && (
                   <DefiProtocolDisplay protocols={defiProtocols} />
+                )}
+                
+                {prediction.votes && prediction.votes.length > 0 && (
+                  <VotesList votes={prediction.votes} groupName={prediction.group?.name} />
                 )}
               </div>
             </div>
