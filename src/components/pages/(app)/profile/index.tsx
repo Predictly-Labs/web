@@ -9,6 +9,7 @@ import { useGetMyGroups } from "@/hooks/useGetMyGroups";
 import { useGetMyVotes } from "@/hooks/useGetMyVotes";
 import { useGetMyVotesStats } from "@/hooks/useGetMyVotesStats";
 import { useUpdateUserProfile } from "@/hooks/useUpdateUserProfile";
+import { useGetMoveBalance } from "@/hooks/useGetMoveBalance";
 import { BsSearch, BsPencil } from "react-icons/bs";
 import { toast } from "sonner";
 import { X, Upload } from "lucide-react";
@@ -35,6 +36,7 @@ export const ProfilePage: React.FC = () => {
   const { myVotes, isLoading: isLoadingVotes, fetchMyVotes } = useGetMyVotes();
   const { stats: votesStats, fetchMyVotesStats, isLoading: isLoadingStats } = useGetMyVotesStats();
   const { updateUserProfile, isLoading: isUpdatingProfile, error: updateError } = useUpdateUserProfile();
+  const { balance: moveBalance, getMoveBalance, isLoading: isLoadingBalance } = useGetMoveBalance();
   const [activeTab, setActiveTab] = useState<"positions" | "activity">(
     "positions"
   );
@@ -59,13 +61,14 @@ export const ProfilePage: React.FC = () => {
       getMyGroups({ limit: 3 });
       fetchMyVotes({ page: 1, limit: 20 });
       fetchMyVotesStats();
+      getMoveBalance();
       setEditForm({
         displayName: user.displayName || "",
         avatarUrl: user.avatarUrl || ""
       });
       setPreviewUrl(user.avatarUrl || "");
     }
-  }, [user, fetchUserStats, getMyGroups, fetchMyVotes, fetchMyVotesStats]);
+  }, [user, fetchUserStats, getMyGroups, fetchMyVotes, fetchMyVotesStats, getMoveBalance]);
 
   useEffect(() => {
     if (userStats) {
@@ -271,7 +274,22 @@ export const ProfilePage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-5 gap-4">
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">
+                      Wallet Balance
+                    </div>
+                    <div className="flex items-center gap-1 text-2xl font-light text-gray-900">
+                      <Image
+                        src="/assets/logo/logo-coin/move-logo.jpeg"
+                        alt="Move Token"
+                        width={20}
+                        height={20}
+                        className="rounded-full"
+                      />
+{moveBalance?.balance ? Math.floor(moveBalance.balance).toString() : "0"}
+                    </div>
+                  </div>
                   <div>
                     <div className="text-sm text-gray-500 mb-1">
                       Total Invested

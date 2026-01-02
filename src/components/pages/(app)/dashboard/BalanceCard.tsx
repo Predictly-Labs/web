@@ -1,8 +1,15 @@
 "use client";
 
+import React, { useEffect } from "react";
 import Image from "next/image";
+import { useGetMoveBalance } from "@/hooks/useGetMoveBalance";
 
 export const BalanceCard = () => {
+  const { balance, getMoveBalance, isLoading } = useGetMoveBalance();
+
+  useEffect(() => {
+    getMoveBalance();
+  }, [getMoveBalance]);
   return (
     <div 
       className="rounded-3xl p-4 sm:p-8 h-auto min-h-[280px] w-full sm:min-h-[320px] relative overflow-hidden"
@@ -49,25 +56,32 @@ export const BalanceCard = () => {
 
         <div className="space-y-2">
           <div className="flex items-end gap-3">
-            <h2 className="text-2xl font-bold text-gray-900">2,847.52</h2>
-            <span className="text-lg text-gray-400 mb-1">
-              {" "}
-              <Image
-                src="/assets/logo/logo-coin/move-logo.jpeg"
-                alt="Movement Logo"
-                width={22}
-                height={22}
-                className="rounded-full"
-              />
-            </span>
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-lg text-gray-500">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {balance?.balance ? Math.floor(balance.balance).toString() : "0"}
+                </h2>
+                <span className="text-lg text-gray-400 mb-1 flex items-center">
+                  <Image
+                    src="/assets/logo/logo-coin/move-logo.jpeg"
+                    alt="Movement Logo"
+                    width={22}
+                    height={22}
+                    className="rounded-full"
+                  />
+                </span>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xl font-semibold text-gray-600">
-              ≈ $12,435.78
+            <span className="text-sm text-gray-500">
+              {balance?.address && `${balance.address.slice(0, 8)}...${balance.address.slice(-6)}`}
             </span>
-            <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-              +12.4%
-            </div>
           </div>
         </div>
       </div>
