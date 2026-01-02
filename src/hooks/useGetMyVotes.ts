@@ -48,7 +48,7 @@ export const useGetMyVotes = () => {
     
     try {
       const data = await getMyVotes(page, limit)
-      setMyVotes(data as MyVote[])
+      setMyVotes(data as unknown as MyVote[])
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch my votes'
       setError(errorMessage)
