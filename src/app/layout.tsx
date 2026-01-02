@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { WalletProvider } from "@/providers/WalletProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import { JotaiProvider } from "@/providers/JotaiProvider";
 import { Toaster } from "sonner";
 
 if (typeof window !== 'undefined') {
@@ -34,12 +35,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <JotaiProvider>
           <WalletProvider>
             <AuthProvider>
               {children}
               <Toaster richColors position="bottom-right" />
             </AuthProvider>
           </WalletProvider>
+        </JotaiProvider>
       </body>
     </html>
   );

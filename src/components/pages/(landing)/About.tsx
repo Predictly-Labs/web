@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useSectionVisibility } from '@/hooks/useLandingState';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,8 +15,29 @@ export const About = () => {
   const subtitleRef = useRef<HTMLDivElement>(null);
   const wordsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const highlightRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const { aboutVisible, setSectionVisibility } = useSectionVisibility();
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setSectionVisibility({
+          section: 'about',
+          visible: entry.isIntersecting
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [setSectionVisibility]);
+
+  useEffect(() => {
+    if (!aboutVisible) return;
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -58,36 +80,42 @@ export const About = () => {
         { opacity: 1, x: 0, duration: 0.8, ease: "power2.out" }, "-=0.5"
       );
 
+      let rafId: number;
       const handleMouseMove = (e: MouseEvent) => {
-        const words = wordsRef.current.filter(Boolean);
-        words.forEach((word) => {
-          if (word) {
-            const rect = word.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const deltaX = e.clientX - centerX;
-            const deltaY = e.clientY - centerY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            
-            if (distance < 100) {
-              const intensity = (100 - distance) / 100;
-              gsap.to(word, {
-                x: deltaX * intensity * 0.1,
-                y: deltaY * intensity * 0.1,
-                scale: 1 + intensity * 0.05,
-                duration: 0.3,
-                ease: "power2.out"
-              });
-            } else {
-              gsap.to(word, {
-                x: 0,
-                y: 0,
-                scale: 1,
-                duration: 0.5,
-                ease: "power2.out"
-              });
+        if (rafId) return;
+        
+        rafId = requestAnimationFrame(() => {
+          const words = wordsRef.current.filter(Boolean);
+          words.forEach((word) => {
+            if (word) {
+              const rect = word.getBoundingClientRect();
+              const centerX = rect.left + rect.width / 2;
+              const centerY = rect.top + rect.height / 2;
+              const deltaX = e.clientX - centerX;
+              const deltaY = e.clientY - centerY;
+              const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+              
+              if (distance < 80) {
+                const intensity = (80 - distance) / 80;
+                gsap.to(word, {
+                  x: deltaX * intensity * 0.05,
+                  y: deltaY * intensity * 0.05,
+                  scale: 1 + intensity * 0.02,
+                  duration: 0.2,
+                  ease: "power1.out"
+                });
+              } else {
+                gsap.to(word, {
+                  x: 0,
+                  y: 0,
+                  scale: 1,
+                  duration: 0.3,
+                  ease: "power1.out"
+                });
+              }
             }
-          }
+          });
+          rafId = 0;
         });
       };
 
@@ -95,12 +123,13 @@ export const About = () => {
 
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
+        if (rafId) cancelAnimationFrame(rafId);
       };
 
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [aboutVisible]);
 
   const addWordRef = (el: HTMLSpanElement | null, index: number) => {
     wordsRef.current[index] = el;
@@ -111,7 +140,7 @@ export const About = () => {
   };
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen bg-gray-50 overflow-hidden">
+    <section id="about" ref={sectionRef} className="relative min-h-screen bg-gray-50 overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         <div>
           <div

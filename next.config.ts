@@ -4,7 +4,14 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   reactCompiler: true,
   turbopack: {},
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['framer-motion', 'gsap', 'sonner'],
+  },
+  compress: true,
   images: {
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 86400,
     remotePatterns: [
       {
         protocol: 'https',

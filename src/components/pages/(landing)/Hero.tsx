@@ -2,7 +2,8 @@
 
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Navbar } from './Navbar'
+import { useRef, useCallback, useEffect } from 'react'
+import { useVideoLoaded, useSectionVisibility } from '@/hooks/useLandingState'
 
 interface HeroContentProps {
   title: string
@@ -20,15 +21,53 @@ interface MarketInfoProps {
 }
 
 export const Hero = () => {
+  const { videoLoaded, setVideoLoaded } = useVideoLoaded()
+  const { setSectionVisibility } = useSectionVisibility()
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
+
   const handleStartNow = () => {
   }
 
+  const handleVideoLoad = useCallback(() => {
+    setVideoLoaded(true)
+  }, [setVideoLoaded])
+
+  const handleVideoError = useCallback(() => {
+    setVideoLoaded(true)
+  }, [setVideoLoaded])
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (!videoLoaded) {
+        setVideoLoaded(true)
+      }
+    }, 3000)
+
+    return () => clearTimeout(timeoutId)
+  }, [videoLoaded, setVideoLoaded])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setSectionVisibility({
+          section: 'hero',
+          visible: entry.isIntersecting
+        })
+      },
+      { threshold: 0.5 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [setSectionVisibility])
 
   return (
-    <section className="relative min-h-screen bg-gray-50 overflow-hidden py-20">
+    <section id="hero" ref={sectionRef} className="relative min-h-screen bg-gray-50 overflow-hidden py-20">
       <div className="container mx-auto px-6">
-        <Navbar />
-        
         <div className="max-w-6xl mx-auto">
           
           <div className="flex items-start justify-between mb-10">
@@ -89,29 +128,41 @@ export const Hero = () => {
             <div className="relative h-96 lg:h-[500px] overflow-hidden rounded-3xl">
               
               <div className="absolute inset-0">
+                {!videoLoaded && (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <div className="animate-pulse text-gray-400">Loading...</div>
+                  </div>
+                )}
                 <video
+                  ref={videoRef}
                   autoPlay
                   loop
                   muted
                   playsInline
-                  className="w-full h-full object-cover"
+                  preload="auto"
+                  onLoadedData={handleVideoLoad}
+                  onCanPlay={handleVideoLoad}
+                  onLoadStart={handleVideoLoad}
+                  onError={handleVideoError}
+                  className={`w-full h-full object-cover transition-opacity duration-500 ${
+                    videoLoaded ? 'opacity-100' : 'opacity-0'
+                  }`}
                 >
                   <source src="/assets/landing/animation/landing-animation.mp4" type="video/mp4" />
                 </video>
               </div>
 
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/10 to-transparent"></div>
-
             </div>
             
             <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-50 backdrop-blur-md rounded-2xl p-2 flex items-center justify-center gap-2 0 w-50 ">
               <span className="text-gray-900 font-medium text-md">Build on</span>
-              <img
+              <Image
                 src="/assets/logo/movement-logo.png"
                 alt="Movement Labs"
                 width={80}
                 height={32}
                 className="object-contain"
+                priority
               />
             </div>
           </motion.div>

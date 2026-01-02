@@ -3,10 +3,14 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useActiveSection } from '@/hooks/useLandingState';
 
 export const Navbar = () => {
+  const activeSection = useActiveSection();
+
   const handleNavClick = (section: string) => {
-    console.log(`Navigate to ${section}`);
+    const element = document.getElementById(section);
+    element?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleLaunchApp = () => {
@@ -36,13 +40,21 @@ export const Navbar = () => {
           <div className="hidden md:flex items-center gap-8">
             <button
               onClick={() => handleNavClick("features")}
-              className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
+              className={`transition-colors text-sm font-medium cursor-pointer ${
+                activeSection === 'features' 
+                  ? 'text-black border-b-2 border-black' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
             >
               Features
             </button>
             <button
               onClick={() => handleNavClick("about")}
-              className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
+              className={`transition-colors text-sm font-medium cursor-pointer ${
+                activeSection === 'about' 
+                  ? 'text-black border-b-2 border-black' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
             >
               About
             </button>
