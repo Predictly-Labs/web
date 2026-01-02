@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Calendar, Users, TrendingUp, Clock, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { usePagination } from '@/hooks/usePredictionMarketState';
 
 interface MarketData {
   id: string;
@@ -248,25 +249,38 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
   onMarketClick,
   onCreateMarket
 }) => {
-  const [activeCurrentPage, setActiveCurrentPage] = useState(1);
-  const [closedCurrentPage, setClosedCurrentPage] = useState(1);
+  const {
+    activeCurrentPage,
+    closedCurrentPage,
+    activeMarkets: globalActiveMarkets,
+    closedMarkets: globalClosedMarkets,
+    paginatedActiveMarkets: globalPaginatedActiveMarkets,
+    paginatedClosedMarkets: globalPaginatedClosedMarkets,
+    activeTotalPages,
+    closedTotalPages,
+    setActiveCurrentPage,
+    setClosedCurrentPage
+  } = usePagination();
   
-  const ITEMS_PER_PAGE = 9;
+  const activeMarkets = markets.length > 0 ? markets.filter(m => m.status === 'active') : globalActiveMarkets;
+  const closedMarkets = markets.length > 0 ? markets.filter(m => m.status === 'closed') : globalClosedMarkets;
   
-  const activeMarkets = markets.filter(m => m.status === 'active');
-  const closedMarkets = markets.filter(m => m.status === 'closed');
-  
-  const activeTotalPages = Math.ceil(activeMarkets.length / ITEMS_PER_PAGE);
-  const closedTotalPages = Math.ceil(closedMarkets.length / ITEMS_PER_PAGE);
+  const localActiveTotalPages = markets.length > 0 ? Math.ceil(activeMarkets.length / 9) : activeTotalPages;
+  const localClosedTotalPages = markets.length > 0 ? Math.ceil(closedMarkets.length / 9) : closedTotalPages;
   
   const getPaginatedMarkets = (marketList: MarketData[], currentPage: number) => {
+    const ITEMS_PER_PAGE = 9;
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     return marketList.slice(startIndex, endIndex);
   };
   
-  const paginatedActiveMarkets = getPaginatedMarkets(activeMarkets, activeCurrentPage);
-  const paginatedClosedMarkets = getPaginatedMarkets(closedMarkets, closedCurrentPage);
+  const paginatedActiveMarkets = markets.length > 0 
+    ? getPaginatedMarkets(activeMarkets, activeCurrentPage)
+    : globalPaginatedActiveMarkets;
+  const paginatedClosedMarkets = markets.length > 0 
+    ? getPaginatedMarkets(closedMarkets, closedCurrentPage)
+    : globalPaginatedClosedMarkets;
 
   const handleMarketClick = (market: MarketData) => {
     onMarketClick?.(market);
@@ -334,7 +348,7 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
                 </div>
                 <Pagination 
                   currentPage={activeCurrentPage}
-                  totalPages={activeTotalPages}
+                  totalPages={localActiveTotalPages}
                   onPageChange={setActiveCurrentPage}
                 />
               </section>
@@ -357,7 +371,7 @@ export const MarketHistory: React.FC<MarketHistoryProps> = ({
                 </div>
                 <Pagination 
                   currentPage={closedCurrentPage}
-                  totalPages={closedTotalPages}
+                  totalPages={localClosedTotalPages}
                   onPageChange={setClosedCurrentPage}
                 />
               </section>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { X, Upload, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
@@ -9,6 +9,11 @@ import { useGetGroups } from '@/hooks/useGetGroups'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'sonner'
 import { MarketTypeSelection } from './MarketTypeSelection'
+import {
+  useCreateForm,
+  useGroups,
+  usePredictionMarketActions
+} from '@/hooks/usePredictionMarketState'
 
 interface CreatePredictionFormProps {
   isOpen: boolean
@@ -28,30 +33,58 @@ interface PredictionFormData {
 }
 
 export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredictionFormProps) => {
-  const [formData, setFormData] = useState<PredictionFormData>({
-    groupId: '',
-    title: '',
-    description: '',
-    imageUrl: '',
-    marketType: 'STANDARD',
-    endDate: '',
-    minStake: '',
-    maxStake: ''
-  })
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState('')
-  const [isGroupDropdownOpen, setIsGroupDropdownOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const { handleCreate, isCreating, createError } = useCreatePrediction()
-  const { getGroups, groups, isLoading: groupsLoading, error: groupsError } = useGetGroups()
+  const { getGroups, groups: apiGroups, isLoading: groupsLoading, error: groupsError } = useGetGroups()
   const { token, isAuthenticated, user } = useAuth()
+  
+  const {
+    createFormData: formData,
+    imageFile,
+    previewUrl,
+    isGroupDropdownOpen,
+    selectedGroup
+  } = useCreateForm()
+  
+  const { groups } = useGroups()
+  
+  const {
+    updateFormField,
+    updateImageFile,
+    updatePreviewUrl,
+    setGroupDropdownOpen,
+    updateGroups,
+    updateGroupsLoading,
+    updateGroupsError
+  } = usePredictionMarketActions()
 
   useEffect(() => {
     if (isOpen && token) {
+      updateGroupsLoading(true);
       getGroups({ limit: 50 })
+        .then(() => {
+          updateGroups(apiGroups);
+          updateGroupsLoading(false);
+        })
+        .catch((err) => {
+          updateGroupsError(err.message);
+          updateGroupsLoading(false);
+        });
     }
-  }, [isOpen, token, getGroups])
+  }, [isOpen, token, getGroups, updateGroups, updateGroupsLoading, updateGroupsError]);
+
+  useEffect(() => {
+    updateGroups(apiGroups);
+  }, [apiGroups, updateGroups]);
+
+  useEffect(() => {
+    updateGroupsLoading(groupsLoading);
+  }, [groupsLoading, updateGroupsLoading]);
+
+  useEffect(() => {
+    updateGroupsError(groupsError);
+  }, [groupsError, updateGroupsError]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -67,11 +100,11 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
       return
     }
 
-    setImageFile(file)
+    updateImageFile(file)
     const reader = new FileReader()
     reader.onload = () => {
-      setPreviewUrl(reader.result as string)
-      setFormData(prev => ({ ...prev, imageUrl: reader.result as string }))
+      updatePreviewUrl(reader.result as string)
+      updateFormField({ imageUrl: reader.result as string })
     }
     reader.readAsDataURL(file)
   }
@@ -112,23 +145,8 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
   }
 
   const handleReset = () => {
-    setFormData({
-      groupId: '',
-      title: '',
-      description: '',
-      imageUrl: '',
-      marketType: 'STANDARD',
-      endDate: '',
-      minStake: '',
-      maxStake: ''
-    })
-    setImageFile(null)
-    setPreviewUrl('')
-    setIsGroupDropdownOpen(false)
     onClose()
   }
-
-  const selectedGroup = groups.find(group => group.id === formData.groupId)
 
   if (!isOpen) return null
 
@@ -184,7 +202,7 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
               <div className="relative">
                 <button
                   type="button"
-                  onClick={() => setIsGroupDropdownOpen(!isGroupDropdownOpen)}
+                  onClick={() => setGroupDropdownOpen(!isGroupDropdownOpen)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl text-left flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer"
                   disabled={groupsLoading}
                 >
@@ -217,8 +235,8 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
                           key={group.id}
                           type="button"
                           onClick={() => {
-                            setFormData(prev => ({ ...prev, groupId: group.id }))
-                            setIsGroupDropdownOpen(false)
+                            updateFormField({ groupId: group.id })
+                            setGroupDropdownOpen(false)
                           }}
                           className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors cursor-pointer"
                         >
@@ -282,7 +300,7 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
 
             <MarketTypeSelection 
               selectedType={formData.marketType}
-              onTypeChange={(type) => setFormData(prev => ({ ...prev, marketType: type }))}
+              onTypeChange={(type) => updateFormField({ marketType: type })}
             />
 
             <div>
@@ -293,7 +311,7 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
                 type="text"
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) => updateFormField({ title: e.target.value })}
                 placeholder="Will BTC reach $100k by end of 2024?"
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-300 text-sm"
                 required
@@ -307,7 +325,7 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
               <textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) => updateFormField({ description: e.target.value })}
                 placeholder="Describe the prediction market details..."
                 rows={3}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-300 text-sm resize-none"
@@ -323,7 +341,7 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
                   type="datetime-local"
                   id="endDate"
                   value={formData.endDate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                  onChange={(e) => updateFormField({ endDate: e.target.value })}
                   min={new Date().toISOString().slice(0, 16)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-200 focus:border-blue-300 text-sm"
                   required
@@ -350,7 +368,7 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
                   type="number"
                   id="minStake"
                   value={formData.minStake}
-                  onChange={(e) => setFormData(prev => ({ ...prev, minStake: e.target.value }))}
+                  onChange={(e) => updateFormField({ minStake: e.target.value })}
                   step="0.001"
                   min="0"
                   placeholder="0.1"
@@ -378,7 +396,7 @@ export const CreatePredictionForm = ({ isOpen, onClose, onSuccess }: CreatePredi
                   type="number"
                   id="maxStake"
                   value={formData.maxStake}
-                  onChange={(e) => setFormData(prev => ({ ...prev, maxStake: e.target.value }))}
+                  onChange={(e) => updateFormField({ maxStake: e.target.value })}
                   step="0.001"
                   min="0"
                   placeholder="1000"
