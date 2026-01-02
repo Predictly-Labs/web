@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Sidebar from "@/components/ui/Sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { useGetUserStats } from "@/hooks/useGetUserStats";
@@ -16,6 +16,11 @@ import { PositionsTab } from "./sections/PositionsTab";
 import { ActivityTab } from "./sections/ActivityTab";
 import { ProfileSidebar } from "./sections/ProfileSidebar";
 import { EditProfileModal } from "./sections/EditProfileModal";
+import {
+  useActiveTab,
+  useEditModal,
+  useProfileActions
+} from "@/hooks/useProfileState";
 
 interface ActivityData {
   day: string;
@@ -40,35 +45,138 @@ export const ProfilePage: React.FC = () => {
   const { stats: votesStats, fetchMyVotesStats, isLoading: isLoadingStats } = useGetMyVotesStats();
   const { updateUserProfile, isLoading: isUpdatingProfile, error: updateError } = useUpdateUserProfile();
   const { balance: moveBalance, getMoveBalance, isLoading: isLoadingBalance } = useGetMoveBalance();
-  const [activeTab, setActiveTab] = useState<"positions" | "activity">("positions");
-  const [activeFilter, setActiveFilter] = useState<"active" | "closed">("active");
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editForm, setEditForm] = useState({ displayName: "", avatarUrl: "" });
-  const [previewUrl, setPreviewUrl] = useState<string>("");
+  
+  const { activeTab } = useActiveTab();
+  const {
+    isEditModalOpen,
+    editForm,
+    previewUrl,
+    isUpdating,
+    updateError: globalUpdateError
+  } = useEditModal();
+  
+  const {
+    updateUserStats,
+    updateGroups,
+    updateMyVotes,
+    updateVotesStats,
+    updateMoveBalance,
+    updateActiveTab,
+    openEditModal,
+    closeEditModal,
+    updateEditForm,
+    updatePreviewUrl,
+    updateLoadingUserStats,
+    updateLoadingGroups,
+    updateLoadingVotes,
+    updateLoadingVotesStats,
+    updateLoadingBalance,
+    updateUpdating,
+    updateUpdateError
+  } = useProfileActions();
 
   useEffect(() => {
     if (user?.id) {
-      fetchUserStats(user.id);
-      getMyGroups({ limit: 3 });
-      fetchMyVotes({ page: 1, limit: 20 });
-      fetchMyVotesStats();
-      getMoveBalance();
+      updateLoadingUserStats(true);
+      updateLoadingGroups(true);
+      updateLoadingVotes(true);
+      updateLoadingVotesStats(true);
+      updateLoadingBalance(true);
+      
+      fetchUserStats(user.id)
+        .then(() => {
+          updateUserStats(userStats);
+          updateLoadingUserStats(false);
+        })
+        .catch(() => updateLoadingUserStats(false));
+        
+      getMyGroups({ limit: 3 })
+        .then(() => {
+          updateGroups(groups);
+          updateLoadingGroups(false);
+        })
+        .catch(() => updateLoadingGroups(false));
+        
+      fetchMyVotes({ page: 1, limit: 20 })
+        .then(() => {
+          updateMyVotes(myVotes);
+          updateLoadingVotes(false);
+        })
+        .catch(() => updateLoadingVotes(false));
+        
+      fetchMyVotesStats()
+        .then(() => {
+          updateVotesStats(votesStats);
+          updateLoadingVotesStats(false);
+        })
+        .catch(() => updateLoadingVotesStats(false));
+        
+      getMoveBalance()
+        .then(() => {
+          updateMoveBalance(moveBalance);
+          updateLoadingBalance(false);
+        })
+        .catch(() => updateLoadingBalance(false));
     }
-  }, [user?.id, fetchUserStats, getMyGroups, fetchMyVotes, fetchMyVotesStats, getMoveBalance]);
+  }, [user?.id]);
+
+  useEffect(() => {
+    updateUserStats(userStats);
+  }, [userStats, updateUserStats]);
+
+  useEffect(() => {
+    updateGroups(groups);
+  }, [groups, updateGroups]);
+
+  useEffect(() => {
+    updateMyVotes(myVotes);
+  }, [myVotes, updateMyVotes]);
+
+  useEffect(() => {
+    updateVotesStats(votesStats);
+  }, [votesStats, updateVotesStats]);
+
+  useEffect(() => {
+    updateMoveBalance(moveBalance);
+  }, [moveBalance, updateMoveBalance]);
+
+  useEffect(() => {
+    updateLoadingGroups(isLoadingGroups);
+  }, [isLoadingGroups, updateLoadingGroups]);
+
+  useEffect(() => {
+    updateLoadingVotes(isLoadingVotes);
+  }, [isLoadingVotes, updateLoadingVotes]);
+
+  useEffect(() => {
+    updateLoadingVotesStats(isLoadingStats);
+  }, [isLoadingStats, updateLoadingVotesStats]);
+
+  useEffect(() => {
+    updateLoadingBalance(isLoadingBalance);
+  }, [isLoadingBalance, updateLoadingBalance]);
+
+  useEffect(() => {
+    updateUpdating(isUpdatingProfile);
+  }, [isUpdatingProfile, updateUpdating]);
+
+  useEffect(() => {
+    updateUpdateError(updateError);
+  }, [updateError, updateUpdateError]);
 
   useEffect(() => {
     if (user) {
-      setEditForm({
+      updateEditForm({
         displayName: user.displayName || "",
         avatarUrl: user.avatarUrl || ""
       });
-      setPreviewUrl(user.avatarUrl || "");
+      updatePreviewUrl(user.avatarUrl || "");
     }
-  }, [user?.displayName, user?.avatarUrl]);
+  }, [user?.displayName, user?.avatarUrl, updateEditForm, updatePreviewUrl]);
 
 
   const handleEditProfile = () => {
-    setIsEditModalOpen(true);
+    openEditModal();
   };
 
   const handleSaveProfile = async () => {
@@ -83,6 +191,7 @@ export const ProfilePage: React.FC = () => {
       avatarUrl = previewUrl;
     }
 
+    updateUpdating(true);
     const result = await updateUserProfile({
       displayName: editForm.displayName,
       avatarUrl: avatarUrl
@@ -95,20 +204,15 @@ export const ProfilePage: React.FC = () => {
       });
       
       toast.success('Profile updated successfully');
-      setIsEditModalOpen(false);
-      setPreviewUrl("");
-    } else if (updateError) {
-      toast.error(updateError);
+      closeEditModal();
+    } else if (globalUpdateError || updateError) {
+      toast.error(globalUpdateError || updateError);
     }
+    updateUpdating(false);
   };
 
   const handleCloseModal = () => {
-    setIsEditModalOpen(false);
-    setPreviewUrl(user?.avatarUrl || "");
-    setEditForm({
-      displayName: user?.displayName || "",
-      avatarUrl: user?.avatarUrl || ""
-    });
+    closeEditModal();
   };
 
   return (
@@ -133,10 +237,6 @@ export const ProfilePage: React.FC = () => {
             <div className="lg:col-span-2 space-y-6">
               <ProfileStats 
                 user={user}
-                moveBalance={moveBalance}
-                votesStats={votesStats}
-                isLoadingStats={isLoadingStats}
-                isLoadingBalance={isLoadingBalance}
                 onEditProfile={handleEditProfile}
               />
 
@@ -144,7 +244,7 @@ export const ProfilePage: React.FC = () => {
                 <div className="border-b border-gray-200">
                   <div className="flex">
                     <button
-                      onClick={() => setActiveTab("positions")}
+                      onClick={() => updateActiveTab("positions")}
                       className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                         activeTab === "positions"
                           ? "border-gray-900 text-gray-900"
@@ -154,7 +254,7 @@ export const ProfilePage: React.FC = () => {
                       Positions
                     </button>
                     <button
-                      onClick={() => setActiveTab("activity")}
+                      onClick={() => updateActiveTab("activity")}
                       className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
                         activeTab === "activity"
                           ? "border-gray-900 text-gray-900"
@@ -167,28 +267,13 @@ export const ProfilePage: React.FC = () => {
                 </div>
 
                 <div className="p-6">
-                  {activeTab === "positions" && (
-                    <PositionsTab
-                      myVotes={myVotes}
-                      activeFilter={activeFilter}
-                      setActiveFilter={setActiveFilter}
-                      isLoadingVotes={isLoadingVotes}
-                    />
-                  )}
-
-                  {activeTab === "activity" && (
-                    <ActivityTab
-                      myVotes={myVotes}
-                      isLoadingVotes={isLoadingVotes}
-                    />
-                  )}
+                  {activeTab === "positions" && <PositionsTab />}
+                  {activeTab === "activity" && <ActivityTab />}
                 </div>
               </div>
             </div>
 
             <ProfileSidebar
-              groups={groups}
-              isLoadingGroups={isLoadingGroups}
               activityData={activityData}
             />
           </div>
@@ -198,13 +283,8 @@ export const ProfilePage: React.FC = () => {
       <EditProfileModal
         isOpen={isEditModalOpen}
         user={user}
-        editForm={editForm}
-        setEditForm={setEditForm}
-        previewUrl={previewUrl}
-        setPreviewUrl={setPreviewUrl}
         onClose={handleCloseModal}
         onSave={handleSaveProfile}
-        isUpdatingProfile={isUpdatingProfile}
       />
     </div>
   );

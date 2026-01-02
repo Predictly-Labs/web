@@ -1,11 +1,8 @@
 import Image from "next/image"
+import { useMyVotes } from "@/hooks/useProfileState"
 
-interface ActivityTabProps {
-  myVotes: any[]
-  isLoadingVotes: boolean
-}
-
-export const ActivityTab = ({ myVotes, isLoadingVotes }: ActivityTabProps) => {
+export const ActivityTab = () => {
+  const { recentActivity, isLoading: isLoadingVotes } = useMyVotes();
   const getStatusColor = (prediction: 'YES' | 'NO') => {
     return prediction === 'YES' 
       ? 'text-green-600 bg-green-100' 
@@ -24,7 +21,7 @@ export const ActivityTab = ({ myVotes, isLoadingVotes }: ActivityTabProps) => {
             Loading activity...
           </div>
         </div>
-      ) : myVotes.length === 0 ? (
+      ) : recentActivity.length === 0 ? (
         <div className="p-8 text-center">
           <div className="text-gray-500 text-sm">
             No activity found
@@ -32,7 +29,7 @@ export const ActivityTab = ({ myVotes, isLoadingVotes }: ActivityTabProps) => {
         </div>
       ) : (
         <div className="space-y-4">
-          {myVotes.slice(0, 10).map((vote) => (
+          {recentActivity.map((vote) => (
             <div key={vote.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
               <div className="flex-shrink-0">
                 {vote.market.imageUrl && (

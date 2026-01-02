@@ -1,33 +1,34 @@
-import { useState } from "react"
 import Image from "next/image"
 import { X } from "lucide-react"
 import { BsPencil } from "react-icons/bs"
 import { toast } from "sonner"
+import { useEditModal, useProfileActions } from "@/hooks/useProfileState"
 
 interface EditProfileModalProps {
   isOpen: boolean
   user?: any
-  editForm: { displayName: string; avatarUrl: string }
-  setEditForm: (form: any) => void
-  previewUrl: string
-  setPreviewUrl: (url: string) => void
   onClose: () => void
   onSave: () => void
-  isUpdatingProfile: boolean
 }
 
 export const EditProfileModal = ({
   isOpen,
   user,
-  editForm,
-  setEditForm,
-  previewUrl,
-  setPreviewUrl,
   onClose,
-  onSave,
-  isUpdatingProfile
+  onSave
 }: EditProfileModalProps) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const {
+    editForm,
+    previewUrl,
+    selectedFile,
+    isUpdating: isUpdatingProfile
+  } = useEditModal();
+  
+  const {
+    updateEditFormField,
+    updatePreviewUrl,
+    updateSelectedFile
+  } = useProfileActions();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,20 +43,17 @@ export const EditProfileModal = ({
         return;
       }
 
-      setSelectedFile(file);
+      updateSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
-        setPreviewUrl(e.target?.result as string);
+        updatePreviewUrl(e.target?.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleFormChange = (field: 'displayName' | 'avatarUrl', value: string) => {
-    setEditForm((prev: any) => ({
-      ...prev,
-      [field]: value
-    }));
+    updateEditFormField({ [field]: value });
   };
 
   if (!isOpen) return null
@@ -84,7 +82,7 @@ export const EditProfileModal = ({
                     width={96}
                     height={96}
                     className="w-full h-full object-cover"
-                    onError={() => setPreviewUrl("")}
+                    onError={() => updatePreviewUrl("")}
                   />
                 ) : user?.avatarUrl ? (
                   <Image
@@ -93,7 +91,7 @@ export const EditProfileModal = ({
                     width={96}
                     height={96}
                     className="w-full h-full object-cover"
-                    onError={() => setPreviewUrl("")}
+                    onError={() => updatePreviewUrl("")}
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-300 flex items-center justify-center">

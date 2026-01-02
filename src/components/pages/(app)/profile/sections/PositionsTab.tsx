@@ -1,28 +1,12 @@
 import Image from "next/image"
 import { BsSearch } from "react-icons/bs"
+import { useMyVotes, useActiveFilter, useSearchQuery, useProfileActions } from "@/hooks/useProfileState"
 
-interface PositionsTabProps {
-  myVotes: any[]
-  activeFilter: 'active' | 'closed'
-  setActiveFilter: (filter: 'active' | 'closed') => void
-  isLoadingVotes: boolean
-}
-
-export const PositionsTab = ({ 
-  myVotes, 
-  activeFilter, 
-  setActiveFilter, 
-  isLoadingVotes 
-}: PositionsTabProps) => {
-  const getFilteredVotes = () => {
-    return myVotes.filter(vote => {
-      if (activeFilter === 'active') {
-        return vote.market.status.toLowerCase() === 'active';
-      } else {
-        return vote.market.status.toLowerCase() === 'closed';
-      }
-    });
-  };
+export const PositionsTab = () => {
+  const { filteredVotes, isLoading: isLoadingVotes } = useMyVotes();
+  const { activeFilter } = useActiveFilter();
+  const { searchQuery } = useSearchQuery();
+  const { updateActiveFilter, updateSearchQuery } = useProfileActions();
 
   const getStatusColor = (prediction: 'YES' | 'NO') => {
     return prediction === 'YES' 
@@ -35,7 +19,7 @@ export const PositionsTab = ({
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-2">
           <button
-            onClick={() => setActiveFilter("active")}
+            onClick={() => updateActiveFilter("active")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
               activeFilter === "active"
                 ? "bg-gray-100 text-gray-900"
@@ -45,7 +29,7 @@ export const PositionsTab = ({
             Active
           </button>
           <button
-            onClick={() => setActiveFilter("closed")}
+            onClick={() => updateActiveFilter("closed")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
               activeFilter === "closed"
                 ? "bg-gray-100 text-gray-900"
@@ -62,6 +46,8 @@ export const PositionsTab = ({
             <input
               type="text"
               placeholder="Search positions"
+              value={searchQuery}
+              onChange={(e) => updateSearchQuery(e.target.value)}
               className="bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-300"
             />
           </div>
@@ -86,7 +72,7 @@ export const PositionsTab = ({
               Loading positions...
             </div>
           </div>
-        ) : getFilteredVotes().length === 0 ? (
+        ) : filteredVotes.length === 0 ? (
           <div className="p-8 text-center bg-white">
             <div className="text-gray-500 text-sm">
               No {activeFilter} positions found
@@ -94,7 +80,7 @@ export const PositionsTab = ({
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
-            {getFilteredVotes().map((vote) => (
+            {filteredVotes.map((vote) => (
               <div key={vote.id} className="grid grid-cols-4 gap-4 px-6 py-4 bg-white hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-3">
                   {vote.market.imageUrl && (

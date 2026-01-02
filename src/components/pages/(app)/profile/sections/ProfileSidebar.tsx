@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { useProfileGroups } from "@/hooks/useProfileState"
 
 interface ActivityData {
   day: string;
@@ -6,12 +7,11 @@ interface ActivityData {
 }
 
 interface ProfileSidebarProps {
-  groups: any[]
-  isLoadingGroups: boolean
   activityData: ActivityData[]
 }
 
-export const ProfileSidebar = ({ groups, isLoadingGroups, activityData }: ProfileSidebarProps) => {
+export const ProfileSidebar = ({ activityData }: ProfileSidebarProps) => {
+  const { groupsLimited: groups, hasMoreGroups, isLoading: isLoadingGroups } = useProfileGroups();
   const maxValue = Math.max(...activityData.map((d) => d.value));
 
   return (
@@ -99,10 +99,10 @@ export const ProfileSidebar = ({ groups, isLoadingGroups, activityData }: Profil
                 </div>
               ))}
             </div>
-            {groups.length > 3 && (
+            {hasMoreGroups && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <button className="text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">
-                  View all groups ({groups.length})
+                  View all groups
                 </button>
               </div>
             )}

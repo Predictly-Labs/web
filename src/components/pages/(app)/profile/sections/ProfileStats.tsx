@@ -1,23 +1,18 @@
 import Image from "next/image"
 import { BsPencil } from "react-icons/bs"
+import { useMoveBalance, useVotesStats } from "@/hooks/useProfileState"
 
 interface ProfileStatsProps {
   user?: any
-  moveBalance?: any
-  votesStats?: any
-  isLoadingStats: boolean
-  isLoadingBalance: boolean
   onEditProfile: () => void
 }
 
 export const ProfileStats = ({ 
   user, 
-  moveBalance, 
-  votesStats, 
-  isLoadingStats,
-  isLoadingBalance,
   onEditProfile 
 }: ProfileStatsProps) => {
+  const { moveBalance, isLoading: isLoadingBalance } = useMoveBalance();
+  const { votesStats, isLoading: isLoadingStats } = useVotesStats();
   const formatWalletAddress = (address: string) => {
     if (!address) return "";
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
