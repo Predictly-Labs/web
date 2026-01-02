@@ -33,7 +33,7 @@ const activityData: ActivityData[] = [
 ];
 
 export const ProfilePage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, getProfile, updateUserState } = useAuth();
   const { userStats, fetchUserStats } = useGetUserStats();
   const { getMyGroups, groups, isLoading: isLoadingGroups } = useGetMyGroups();
   const { myVotes, isLoading: isLoadingVotes, fetchMyVotes } = useGetMyVotes();
@@ -53,13 +53,18 @@ export const ProfilePage: React.FC = () => {
       fetchMyVotes({ page: 1, limit: 20 });
       fetchMyVotesStats();
       getMoveBalance();
+    }
+  }, [user?.id, fetchUserStats, getMyGroups, fetchMyVotes, fetchMyVotesStats, getMoveBalance]);
+
+  useEffect(() => {
+    if (user) {
       setEditForm({
         displayName: user.displayName || "",
         avatarUrl: user.avatarUrl || ""
       });
       setPreviewUrl(user.avatarUrl || "");
     }
-  }, [user, fetchUserStats, getMyGroups, fetchMyVotes, fetchMyVotesStats, getMoveBalance]);
+  }, [user?.displayName, user?.avatarUrl]);
 
 
   const handleEditProfile = () => {
@@ -84,10 +89,14 @@ export const ProfilePage: React.FC = () => {
     });
     
     if (result) {
+      updateUserState({
+        displayName: result.displayName,
+        avatarUrl: result.avatarUrl
+      });
+      
       toast.success('Profile updated successfully');
       setIsEditModalOpen(false);
       setPreviewUrl("");
-      window.location.reload();
     } else if (updateError) {
       toast.error(updateError);
     }

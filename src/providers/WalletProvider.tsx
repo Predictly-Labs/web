@@ -36,7 +36,14 @@ export function WalletProvider({ children }: Props) {
           try {
             const wallet = getWallet()
             if (wallet) {
-              const account = await wallet.account()
+              let account = null
+              
+              if (wallet.account && typeof wallet.account === 'function') {
+                account = await wallet.account()
+              } else if (wallet.getAccount && typeof wallet.getAccount === 'function') {
+                account = await wallet.getAccount()
+              }
+              
               if (account) {
                 setAddress(account.address)
                 setConnected(true)
@@ -157,15 +164,25 @@ export function WalletProvider({ children }: Props) {
       
       if (!publicKey) {
         try {
-          const account = await currentWallet.account()
-          // console.log('Account data:', account)
+          let account = null
           
-          if (account.publicKey && typeof account.publicKey === 'string') {
-            publicKey = account.publicKey
-          } else if (account.authentication_key) {
-            publicKey = account.authentication_key.slice(0, 66)
+          if (currentWallet.account && typeof currentWallet.account === 'function') {
+            account = await currentWallet.account()
+          } else if (currentWallet.getAccount && typeof currentWallet.getAccount === 'function') {
+            account = await currentWallet.getAccount()
+          }
+          
+          if (account) {
+            if (account.publicKey && typeof account.publicKey === 'string') {
+              publicKey = account.publicKey
+            } else if (account.authentication_key) {
+              publicKey = account.authentication_key.slice(0, 66)
+            } else {
+              console.warn('No publicKey found in account, using address')
+              publicKey = address || ''
+            }
           } else {
-            console.warn('No publicKey found in account, using address')
+            console.warn('No account method available, using address')
             publicKey = address || ''
           }
         } catch (e) {

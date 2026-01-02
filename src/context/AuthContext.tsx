@@ -60,6 +60,7 @@ interface AuthContextType {
   login: (authData: AuthData) => Promise<void>
   logout: () => void
   getProfile: () => Promise<User | null>
+  updateUserState: (userData: Partial<User>) => void
   initializeAuth: () => Promise<void>
   isAuthenticated: boolean
 }
@@ -219,6 +220,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [token, logout])
 
+  const updateUserState = useCallback((userData: Partial<User>) => {
+    setUser(prevUser => {
+      if (!prevUser) return null
+      
+      const updatedUser = { ...prevUser, ...userData }
+      
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('user', JSON.stringify(updatedUser))
+        localStorage.setItem('user', JSON.stringify(updatedUser))
+      }
+      
+      return updatedUser
+    })
+  }, [])
+
   const initializeAuth = useCallback(async () => {
     if (typeof window === 'undefined') return
 
@@ -255,6 +271,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     logout,
     getProfile,
+    updateUserState,
     initializeAuth,
     isAuthenticated: !!user && !!token,
   }
