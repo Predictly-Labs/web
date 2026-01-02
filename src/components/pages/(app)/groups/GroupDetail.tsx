@@ -364,7 +364,7 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
                     
                     {judges.length > 0 && (
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-600">Current Judges:</span>
+                        <span className="text-sm text-gray-600">Current Groups Judges/Resolver :</span>
                         <div className="flex items-center gap-2">
                           {judges.slice(0, 3).map((judge) => (
                             <div key={judge.id} className="flex items-center gap-1">
