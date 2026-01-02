@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGetMyVotesStats } from '@/hooks/useGetMyVotesStats';
+import { useActivityCard } from '@/hooks/useDashboardCards';
 import { ActivityHeader } from './ActivityHeader';
 import { ActivityStats } from './ActivityStats';
 import { ActivityChart } from './ActivityChart';
@@ -10,14 +11,38 @@ import { ActivityChart } from './ActivityChart';
 export const ActivityCard = () => {
   const { user } = useAuth();
   const { stats, fetchMyVotesStats, isLoading } = useGetMyVotesStats();
+  const { data: activityData, updateCard } = useActivityCard();
 
   useEffect(() => {
     if (user?.id) {
-      fetchMyVotesStats();
+      updateCard({ isLoading: true });
+      fetchMyVotesStats()
+        .then(() => {
+          const weekData = [
+            { day: "Mon", value: 35 },
+            { day: "Tue", value: 52 },
+            { day: "Wed", value: 28 },
+            { day: "Thu", value: 73 },
+            { day: "Fri", value: 95 },
+            { day: "Sat", value: 41 },
+            { day: "Sun", value: 67 },
+          ];
+          updateCard({ 
+            isLoading: false, 
+            data: { stats, weekData } 
+          });
+        })
+        .catch((error) => {
+          updateCard({ 
+            isLoading: false, 
+            error: error.message 
+          });
+        });
     }
-  }, [user, fetchMyVotesStats]);
+  }, [user, fetchMyVotesStats, updateCard]);
 
-  const weekData = [
+  const displayStats = (activityData as any)?.stats || stats;
+  const displayWeekData = (activityData as any)?.weekData || [
     { day: "Mon", value: 35 },
     { day: "Tue", value: 52 },
     { day: "Wed", value: 28 },
@@ -42,10 +67,10 @@ export const ActivityCard = () => {
         <ActivityHeader />
         <div className="space-y-6">
           <ActivityStats 
-            totalVotes={stats?.totalVotes || 0} 
+            totalVotes={displayStats?.totalVotes || 0} 
             isLoading={isLoading} 
           />
-          <ActivityChart data={weekData} />
+          <ActivityChart data={displayWeekData} />
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useWallet } from "@/providers/WalletProvider";
 import { useAuth } from "@/hooks/useAuth";
 import Sidebar from "../../../ui/Sidebar";
@@ -9,11 +9,22 @@ import { DashboardHeader } from "./sections/DashboardHeader";
 import { DashboardGrid } from "./sections/DashboardGrid";
 import { LoadingState } from "./sections/LoadingState";
 import { ConnectWalletState } from "./sections/ConnectWalletState";
+import { 
+  useDashboardState, 
+  useInitialized, 
+  useWalletState, 
+  useAuthState, 
+  useProfileLoading,
+  useDashboardActions 
+} from "@/hooks/useDashboardState";
 
 export const Dashboard = () => {
   const { connected, address, connect, disconnect } = useWallet();
   const { user, login, logout, isLoading, error, isAuthenticated, getProfile, initializeAuth, token, getSignMessage } = useAuth();
-  const [isInitialized, setIsInitialized] = useState(false);
+  
+  const { isInitialized, setInitialized } = useInitialized();
+  const { setWalletState, setAuthState, setProfileLoading } = useDashboardActions();
+  const { profileLoading } = useProfileLoading();
 
   const handleConnectWallet = async () => {
     try {
@@ -50,38 +61,31 @@ export const Dashboard = () => {
   useEffect(() => {
     const init = async () => {
       await initializeAuth();
-      setIsInitialized(true);
+      setInitialized(true);
     };
     init();
-  }, []);
+  }, [initializeAuth, setInitialized]);
 
   useEffect(() => {
-    if (!isInitialized) return;
-  }, [isInitialized, connected, address, isAuthenticated, user, token]);
+    setWalletState({ connected, address });
+  }, [connected, address, setWalletState]);
+
+  useEffect(() => {
+    setAuthState({ authenticated: isAuthenticated, user, token });
+  }, [isAuthenticated, user, token, setAuthState]);
 
   useEffect(() => {
     if (isAuthenticated && token && !user) {
-      getProfile();
+      setProfileLoading(true);
+      getProfile().finally(() => setProfileLoading(false));
     }
-  }, [isAuthenticated, token, user, getProfile]);
-
-  useEffect(() => {
-    if (isAuthenticated && token) {
-      const interval = setInterval(() => {
-        if (!user) {
-          getProfile();
-        }
-      }, 1000);
-      
-      return () => clearInterval(interval);
-    }
-  }, [isAuthenticated, token, user, getProfile]);
+  }, [isAuthenticated, token, user, getProfile, setProfileLoading]);
 
   if (!isInitialized) {
     return <LoadingState message="Loading..." />;
   }
-
-  if (isAuthenticated && token && !user) {
+  
+  if (profileLoading || (isAuthenticated && token && !user)) {
     return <LoadingState message="Loading profile..." />;
   }
 

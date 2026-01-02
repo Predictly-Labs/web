@@ -3,13 +3,28 @@
 import React, { useEffect } from "react";
 import Image from "next/image";
 import { useGetMoveBalance } from "@/hooks/useGetMoveBalance";
+import { useBalanceCard } from "@/hooks/useDashboardCards";
 
 export const BalanceCard = () => {
   const { balance, getMoveBalance, isLoading } = useGetMoveBalance();
+  const { data: balanceData, updateCard } = useBalanceCard();
 
   useEffect(() => {
-    getMoveBalance();
-  }, [getMoveBalance]);
+    updateCard({ isLoading: true });
+    getMoveBalance()
+      .then((result) => {
+        updateCard({ 
+          isLoading: false, 
+          data: result 
+        });
+      })
+      .catch((error) => {
+        updateCard({ 
+          isLoading: false, 
+          error: error.message 
+        });
+      });
+  }, [getMoveBalance, updateCard]);
   return (
     <div 
       className="rounded-3xl p-4 sm:p-8 h-auto min-h-[280px] w-full sm:min-h-[320px] relative overflow-hidden"
@@ -63,24 +78,36 @@ export const BalanceCard = () => {
               </div>
             ) : (
               <>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {balance?.balance ? Math.floor(balance.balance).toString() : "0"}
-                </h2>
-                <span className="text-lg text-gray-400 mb-1 flex items-center">
-                  <Image
-                    src="/assets/logo/logo-coin/move-logo.jpeg"
-                    alt="Movement Logo"
-                    width={22}
-                    height={22}
-                    className="rounded-full"
-                  />
-                </span>
+                {(() => {
+                  const currentBalance = balanceData || balance;
+                  return (
+                    <>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        {currentBalance?.balance ? Math.floor(currentBalance.balance).toString() : "0"}
+                      </h2>
+                      <span className="text-lg text-gray-400 mb-1 flex items-center">
+                        <Image
+                          src="/assets/logo/logo-coin/move-logo.jpeg"
+                          alt="Movement Logo"
+                          width={22}
+                          height={22}
+                          className="rounded-full"
+                        />
+                      </span>
+                    </>
+                  );
+                })()}
               </>
             )}
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500">
-              {balance?.address && `${balance.address.slice(0, 8)}...${balance.address.slice(-6)}`}
+              {(() => {
+                const currentBalance = balanceData || balance;
+                return currentBalance?.address 
+                  ? `${currentBalance.address.slice(0, 8)}...${currentBalance.address.slice(-6)}`
+                  : "";
+              })()}
             </span>
           </div>
         </div>
