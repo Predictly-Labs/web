@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Users, TrendingUp, Clock, Crown } from "lucide-react";
+import { Users, TrendingUp, Crown } from "lucide-react";
+import Image from "next/image";
 import { GroupData } from "@/types/group";
 
 interface GroupCardProps {
@@ -68,7 +69,13 @@ export const GroupCard: React.FC<GroupCardProps> = ({ group, onClick }) => {
               </span>
               {group.totalVolume > 0 && (
                 <span className="flex items-center gap-1.5 bg-white/80 px-2 py-1 rounded-full">
-                  <Clock className="w-3 h-3 text-black" />
+                  <Image
+                    src="/assets/logo/logo-coin/move-logo.jpeg"
+                    alt="Move Token"
+                    width={12}
+                    height={12}
+                    className="rounded-full"
+                  />
                   <span className="font-medium">
                     {formatVolume(group.totalVolume)}
                   </span>

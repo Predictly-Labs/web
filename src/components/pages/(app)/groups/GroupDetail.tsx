@@ -359,12 +359,12 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
                       className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
                     >
                       <Settings className="w-4 h-4" />
-                      Manage Judges
+                      Manage Resolver
                     </button>
                     
                     {judges.length > 0 && (
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-600">Current Groups Judges/Resolver :</span>
+                        <span className="text-sm text-gray-600">Current Groups Resolver :</span>
                         <div className="flex items-center gap-2">
                           {judges.slice(0, 3).map((judge) => (
                             <div key={judge.id} className="flex items-center gap-1">
