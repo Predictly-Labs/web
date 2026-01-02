@@ -179,15 +179,9 @@ Need help? Here's how to get support:
 - **📖 Documentation** - Check our comprehensive docs
 - **🐛 Issues** - Report bugs or request features on GitHub
 - **💬 Community** - Join our Discord community
-- **📧 Email** - Contact us at support@predictly.app
 
 ---
 
 <div align="center">
   <p>Made with ❤️ by the Predictly Team</p>
-  <p>
-    <a href="https://twitter.com/predictlyapp">Twitter</a> •
-    <a href="https://discord.gg/predictly">Discord</a> •
-    <a href="https://predictly.app">Website</a>
-  </p>
 </div>
