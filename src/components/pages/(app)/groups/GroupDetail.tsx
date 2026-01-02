@@ -356,7 +356,7 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
                   <div className="flex items-center justify-between">
                     <button
                       onClick={() => setIsJudgeManagementOpen(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                      className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
                     >
                       <Settings className="w-4 h-4" />
                       Manage Judges
