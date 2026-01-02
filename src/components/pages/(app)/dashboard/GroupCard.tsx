@@ -17,7 +17,7 @@ export const GroupCard = () => {
 
   return (
     <div
-      className="rounded-3xl p-4 sm:p-6 w-full h-auto min-h-[300px] sm:min-h-[400px] relative overflow-hidden"
+      className="rounded-3xl p-4 sm:p-6 w-full h-auto min-h-[300px] sm:min-h-[400px] relative overflow-hidden mb-2"
       style={{
         backgroundImage: "url('/assets/main/background/bg-main.png')",
         backgroundSize: "cover",
