@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useGetPredictionById } from '@/hooks/useGetPredictionById'
 import { usePlaceVote } from '@/hooks/usePlaceVote'
@@ -14,6 +14,17 @@ import { VotingSection } from './sections/VotingSection'
 import { ResolveModal } from './sections/ResolveModal'
 import { LoadingState } from './sections/LoadingState'
 import { ErrorState } from './sections/ErrorState'
+import {
+  usePrediction,
+  useMarketLoading,
+  useMarketError,
+  useVoting,
+  useResolving,
+  useResolveModal,
+  useMarketId,
+  useMarketPermissions,
+  useMarketDetailActions
+} from '@/hooks/useMarketDetailState'
 
 interface MarketDetailProps {
   marketId: string
@@ -25,72 +36,135 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
   const { prediction, fetchPredictionById, isLoading, error } = useGetPredictionById()
   const { placeVote, isVoting, voteError } = usePlaceVote()
   const { resolveMarket, isResolving, resolveError } = useResolveMarket()
-  const [isResolveModalOpen, setIsResolveModalOpen] = useState(false)
-  const [resolveForm, setResolveForm] = useState({
-    outcome: 'YES' as 'YES' | 'NO',
-    resolutionNote: ''
-  })
+  
+  const { prediction: globalPrediction } = usePrediction()
+  const { isLoading: globalLoading } = useMarketLoading()
+  const { error: globalError } = useMarketError()
+  const { isVoting: globalVoting, voteError: globalVoteError } = useVoting()
+  const { isResolving: globalResolving, resolveError: globalResolveError } = useResolving()
+  const { isResolveModalOpen, resolveForm } = useResolveModal()
+  const { hasValidStakeRange } = useMarketPermissions()
+  const {
+    updatePrediction,
+    updateLoading,
+    updateError,
+    updateVoting,
+    updateVoteError,
+    updateResolving,
+    updateResolveError,
+    updateResolveForm,
+    updateMarketId,
+    openResolveModal,
+    closeResolveModal
+  } = useMarketDetailActions()
 
   useEffect(() => {
+    updateMarketId(marketId)
     if (marketId) {
+      updateLoading(true)
       fetchPredictionById(marketId)
+        .then(() => {
+          updatePrediction(prediction)
+          updateLoading(false)
+        })
+        .catch((err) => {
+          updateError(err.message)
+          updateLoading(false)
+        })
     }
-  }, [marketId, fetchPredictionById])
+  }, [marketId, fetchPredictionById, updateMarketId, updatePrediction, updateLoading, updateError])
+
+  useEffect(() => {
+    updatePrediction(prediction)
+  }, [prediction, updatePrediction])
+
+  useEffect(() => {
+    updateLoading(isLoading)
+  }, [isLoading, updateLoading])
+
+  useEffect(() => {
+    updateError(error)
+  }, [error, updateError])
+
+  useEffect(() => {
+    updateVoting(isVoting)
+  }, [isVoting, updateVoting])
+
+  useEffect(() => {
+    updateVoteError(voteError)
+  }, [voteError, updateVoteError])
+
+  useEffect(() => {
+    updateResolving(isResolving)
+  }, [isResolving, updateResolving])
+
+  useEffect(() => {
+    updateResolveError(resolveError)
+  }, [resolveError, updateResolveError])
 
   const handleBack = () => {
     router.push('/app/create-market')
   }
 
   const handlePlaceVote = async (selectedVote: 'YES' | 'NO', voteAmount: string) => {
-    if (!prediction) {
+    const currentPrediction = globalPrediction || prediction
+    if (!currentPrediction) {
       toast.error('Market data not available')
       return
     }
 
     const amount = parseFloat(voteAmount)
-    if (amount < prediction.minStake || amount > prediction.maxStake) {
-      toast.error(`Amount must be between ${prediction.minStake} and ${prediction.maxStake} MOVE`)
+    if (!hasValidStakeRange) {
+      toast.error('Invalid stake range configuration')
+      return
+    }
+    
+    if (amount < currentPrediction.minStake || amount > currentPrediction.maxStake) {
+      toast.error(`Amount must be between ${currentPrediction.minStake} and ${currentPrediction.maxStake} MOVE`)
       return
     }
 
-    const result = await placeVote(prediction.id, { prediction: selectedVote, amount })
+    updateVoting(true)
+    const result = await placeVote(currentPrediction.id, { prediction: selectedVote, amount })
     if (result) {
       toast.success(`Successfully placed ${selectedVote} vote for ${amount} MOVE`)
       fetchPredictionById(marketId)
     }
+    updateVoting(false)
   }
 
   const handleResolveMarket = async () => {
-    if (!prediction || !resolveForm.resolutionNote.trim()) {
+    const currentPrediction = globalPrediction || prediction
+    if (!currentPrediction || !resolveForm.resolutionNote.trim()) {
       toast.error('Please provide a resolution note')
       return
     }
 
-    const result = await resolveMarket(prediction.id, {
+    updateResolving(true)
+    const result = await resolveMarket(currentPrediction.id, {
       outcome: resolveForm.outcome,
       resolutionNote: resolveForm.resolutionNote
     })
 
     if (result) {
       toast.success(`Market resolved as ${resolveForm.outcome}`)
-      setIsResolveModalOpen(false)
-      setResolveForm({ outcome: 'YES', resolutionNote: '' })
+      closeResolveModal()
       fetchPredictionById(marketId)
-    } else if (resolveError) {
-      toast.error(resolveError)
+    } else if (globalResolveError || resolveError) {
+      toast.error(globalResolveError || resolveError)
     }
+    updateResolving(false)
   }
 
-  const handleCloseResolveModal = () => {
-    setIsResolveModalOpen(false)
-    setResolveForm({ outcome: 'YES', resolutionNote: '' })
-  }
+  const currentPrediction = globalPrediction || prediction
+  const currentLoading = globalLoading || isLoading
+  const currentError = globalError || error
 
-  if (isLoading) {
+  if (currentLoading) {
     return <LoadingState />
   }
 
-  if (error || !prediction) {
+  if (currentError || !currentPrediction) {
     return <ErrorState onBack={handleBack} />
   }
 
@@ -100,7 +174,7 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
       <Sidebar />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <MarketDetailHeader prediction={prediction} onBack={handleBack} />
+        <MarketDetailHeader prediction={currentPrediction} onBack={handleBack} />
 
         <div
           className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-4 border-white"
@@ -112,14 +186,14 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
             opacity: 0.8,
           }}
         >
-          <MarketDetailStats prediction={prediction}>
+          <MarketDetailStats prediction={currentPrediction}>
             <VotingSection
-              prediction={prediction}
+              prediction={currentPrediction}
               user={user}
               onPlaceVote={handlePlaceVote}
-              onOpenResolveModal={() => setIsResolveModalOpen(true)}
-              isVoting={isVoting}
-              voteError={voteError}
+              onOpenResolveModal={openResolveModal}
+              isVoting={globalVoting || isVoting}
+              voteError={globalVoteError || voteError}
             />
           </MarketDetailStats>
         </div>
@@ -127,11 +201,11 @@ export const MarketDetail = ({ marketId }: MarketDetailProps) => {
 
       <ResolveModal
         isOpen={isResolveModalOpen}
-        onClose={handleCloseResolveModal}
+        onClose={closeResolveModal}
         onResolve={handleResolveMarket}
         resolveForm={resolveForm}
-        setResolveForm={setResolveForm}
-        isResolving={isResolving}
+        setResolveForm={updateResolveForm}
+        isResolving={globalResolving || isResolving}
       />
     </div>
   )
