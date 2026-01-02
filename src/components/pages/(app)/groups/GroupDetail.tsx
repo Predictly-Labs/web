@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { ArrowLeft, Calendar, Users, TrendingUp, Clock } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useGetGroup } from "@/hooks/useGetGroupbyId";
 import { useGetGroupMarkets } from "@/hooks/useGetGroupMarkets";
+import { useGetGroupMembers } from "@/hooks/useGetGroupMembers";
 import Sidebar from "../../../ui/Sidebar";
 import Image from "next/image";
+import { JudgeManagement } from "./JudgeManagement";
 
 interface GroupMarket {
   id: string;
@@ -184,13 +186,16 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
   const router = useRouter();
   const { getGroup, group, isLoading: isLoadingGroup, error: groupError } = useGetGroup();
   const { getGroupMarkets, markets, isLoading: isLoadingMarkets, error: marketsError } = useGetGroupMarkets();
+  const { getGroupMembers, members, isLoading: isLoadingMembers } = useGetGroupMembers();
+  const [isJudgeManagementOpen, setIsJudgeManagementOpen] = useState(false);
 
   useEffect(() => {
     if (groupId) {
       getGroup(groupId);
       getGroupMarkets(groupId, { status: 'ACTIVE', limit: 10, offset: 0 });
+      getGroupMembers(groupId);
     }
-  }, [groupId, getGroup, getGroupMarkets]);
+  }, [groupId, getGroup, getGroupMarkets, getGroupMembers]);
 
   const handleBackToGroups = () => {
     router.push('/app/groups');
@@ -240,6 +245,7 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
 
   const activeMarkets = markets.filter(m => m.status.toUpperCase() === 'ACTIVE');
   const closedMarkets = markets.filter(m => m.status.toUpperCase() === 'CLOSED');
+  const judges = members.filter(member => member.role === 'JUDGE');
 
   return (
     <div className="p-3 sm:p-6 min-h-screen relative bg-[#f7f5fa]">
@@ -345,6 +351,47 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
                     <p className="text-xs text-gray-600">Active</p>
                   </div>
                 </div>
+
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => setIsJudgeManagementOpen(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Manage Judges
+                    </button>
+                    
+                    {judges.length > 0 && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-gray-600">Current Judges:</span>
+                        <div className="flex items-center gap-2">
+                          {judges.slice(0, 3).map((judge) => (
+                            <div key={judge.id} className="flex items-center gap-1">
+                              <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                                <Image
+                                  src={judge.user.avatarUrl || '/default-avatar.png'}
+                                  alt={judge.user.displayName}
+                                  width={24}
+                                  height={24}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <span className="text-sm font-medium text-gray-900">
+                                {judge.user.displayName}
+                              </span>
+                            </div>
+                          ))}
+                          {judges.length > 3 && (
+                            <span className="text-sm text-gray-500">
+                              +{judges.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {activeMarkets.length > 0 && (
@@ -397,6 +444,12 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
             </div>
           </div>
         </div>
+
+        <JudgeManagement
+          groupId={groupId}
+          isOpen={isJudgeManagementOpen}
+          onClose={() => setIsJudgeManagementOpen(false)}
+        />
       </div>
     </div>
   );
