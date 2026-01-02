@@ -3,28 +3,17 @@ import { Check, X } from "lucide-react";
 import Lottie from "lottie-react";
 import proAnimation from "../../../../../../public/assets/main/animation/pro-animation.json";
 import enterpriseAnimation from "../../../../../../public/assets/main/animation/enterprise-animation.json";
+import { useModal, useSubscriptionsActions } from "@/hooks/useSubscriptionsState";
 
-interface PricingPlan {
-  name: string;
-  price: string;
-  period: string;
-  features: string[];
-  recommended?: boolean;
-  ctaText: string;
-}
-
-interface PlanModalProps {
-  isOpen: boolean;
-  plan: PricingPlan | null;
-  onClose: () => void;
-}
-
-export const PlanModal = ({ isOpen, plan, onClose }: PlanModalProps) => {
-  if (!plan) return null;
+export const PlanModal = () => {
+  const { isModalOpen, selectedModalPlan } = useModal();
+  const { handleCloseModal } = useSubscriptionsActions();
+  
+  if (!selectedModalPlan) return null;
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isModalOpen && (
         <motion.div 
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           initial={{ opacity: 0 }}
@@ -41,10 +30,10 @@ export const PlanModal = ({ isOpen, plan, onClose }: PlanModalProps) => {
           >
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h2 className="text-xl font-semibold text-gray-900">
-                {plan.name} Plan Details
+                {selectedModalPlan.name} Plan Details
               </h2>
               <motion.button
-                onClick={onClose}
+                onClick={handleCloseModal}
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -63,22 +52,22 @@ export const PlanModal = ({ isOpen, plan, onClose }: PlanModalProps) => {
                   transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.3 }}
                 >
                   <Lottie 
-                    animationData={plan.name === "Pro" ? proAnimation : enterpriseAnimation}
+                    animationData={selectedModalPlan.name === "Pro" ? proAnimation : enterpriseAnimation}
                     className="w-32 h-32 mx-auto"
                     loop
                   />
                 </motion.div>
                 
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  {plan.name}
+                  {selectedModalPlan.name}
                 </h3>
                 <div className="mb-4">
                   <span className="text-3xl font-bold text-gray-900">
-                    {plan.price}
+                    {selectedModalPlan.price}
                   </span>
-                  {plan.period && (
+                  {selectedModalPlan.period && (
                     <span className="text-lg text-gray-500">
-                      {plan.period}
+                      {selectedModalPlan.period}
                     </span>
                   )}
                 </div>
@@ -94,7 +83,7 @@ export const PlanModal = ({ isOpen, plan, onClose }: PlanModalProps) => {
                   Features included:
                 </motion.h4>
                 <ul className="space-y-3">
-                  {plan.features.map((feature, index) => (
+                  {selectedModalPlan.features.map((feature, index) => (
                     <motion.li 
                       key={index} 
                       className="flex items-start gap-3"
@@ -116,7 +105,7 @@ export const PlanModal = ({ isOpen, plan, onClose }: PlanModalProps) => {
                 transition={{ delay: 0.8 }}
               >
                 <motion.button
-                  onClick={onClose}
+                  onClick={handleCloseModal}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}

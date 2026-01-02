@@ -1,30 +1,16 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
-
-interface PricingPlan {
-  name: string;
-  price: string;
-  period: string;
-  features: string[];
-  recommended?: boolean;
-  ctaText: string;
-}
+import { useSelectedPlan, useSubscriptionsActions } from "@/hooks/useSubscriptionsState";
+import { PricingPlan } from "@/store/subscriptions";
 
 interface PricingPlanCardProps {
   plan: PricingPlan;
   index: number;
-  selectedPlan: string;
-  onPlanSelect: (planName: string) => void;
-  onSubscribe: (plan: PricingPlan) => void;
 }
 
-export const PricingPlanCard = ({ 
-  plan, 
-  index, 
-  selectedPlan, 
-  onPlanSelect, 
-  onSubscribe 
-}: PricingPlanCardProps) => {
+export const PricingPlanCard = ({ plan, index }: PricingPlanCardProps) => {
+  const { selectedPlan } = useSelectedPlan();
+  const { handlePlanSelect, handleSubscribe } = useSubscriptionsActions();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -39,7 +25,7 @@ export const PricingPlanCard = ({
           ? "border-gray-300 bg-gray-50"
           : "bg-white hover:border-gray-300"
       }`}
-      onClick={() => onPlanSelect(plan.name)}
+      onClick={() => handlePlanSelect(plan.name)}
     >
       {plan.recommended && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -97,7 +83,7 @@ export const PricingPlanCard = ({
       </ul>
 
       <motion.button
-        onClick={() => onSubscribe(plan)}
+        onClick={() => handleSubscribe(plan)}
         disabled={plan.name === "Basic"}
         whileHover={plan.name !== "Basic" ? { scale: 1.05 } : {}}
         whileTap={plan.name !== "Basic" ? { scale: 0.95 } : {}}
