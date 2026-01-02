@@ -19,6 +19,9 @@
 
 ## 🌟 Overview
 
+<img width="1710" height="932" alt="image" src="https://github.com/user-attachments/assets/0cda6c5b-51cc-454f-b891-1b40a75c9811" />
+
+
 Predictly is a cutting-edge decentralized application that enables users to create and participate in prediction markets. Built on the Move blockchain, it combines the excitement of forecasting with the security and transparency of decentralized finance.
 
 Whether you're predicting sports outcomes, crypto prices, or world events, Predictly provides a seamless platform to test your forecasting skills and earn rewards for accurate predictions.
