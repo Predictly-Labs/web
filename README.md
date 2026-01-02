@@ -125,6 +125,7 @@ To start using Predictly, you'll need a Move-compatible wallet:
 - **⚡ Movement Testnet** - Fast and low-cost transactions
 
 ### **State Management**
+- **⚛️ Jotai** - Atomic state management for optimal performance
 - **🔧 Custom Hooks** - React hooks for API and state management
 - **📡 SWR** - Data fetching and caching
 - **🍞 Sonner** - Toast notifications
@@ -139,19 +140,53 @@ To start using Predictly, you'll need a Move-compatible wallet:
 
 ```
 src/
-├── components/           # Reusable UI components
-│   ├── ui/              # Basic UI components
-│   └── pages/           # Page-specific components
-├── hooks/               # Custom React hooks
-├── types/               # TypeScript type definitions
-├── providers/           # Context providers
-└── app/                 # Next.js App Router pages
+├── app/                          # Next.js App Router pages
+│   ├── (auth)/                  # Authentication pages
+│   ├── (main)/                  # Main application pages
+│   │   └── (app)/              # App pages (dashboard, groups, etc.)
+│   └── globals.css             # Global styles
+├── components/                   # Reusable UI components
+│   ├── ui/                     # Basic UI components (buttons, modals, etc.)
+│   └── pages/                  # Page-specific components
+│       └── (app)/              # App page components
+│           ├── dashboard/       # Dashboard components
+│           ├── groups/         # Groups management components
+│           ├── profile/        # User profile components
+│           ├── prediction-market/ # Market components
+│           └── subscriptions/   # Subscription components
+├── hooks/                       # Custom React hooks
+│   ├── useAuth.ts              # Authentication hooks
+│   ├── useProfileState.ts      # Profile state management
+│   ├── useGroupsState.ts       # Groups state management
+│   ├── useMarketDetailState.ts # Market detail state
+│   ├── usePredictionMarketState.ts # Prediction market state
+│   └── useSubscriptionsState.ts # Subscriptions state
+├── store/                       # Jotai atomic state stores
+│   ├── landing.ts              # Landing page state
+│   ├── dashboard.ts            # Dashboard state atoms
+│   ├── dashboardCards.ts       # Dashboard cards state
+│   ├── groups.ts               # Groups state atoms
+│   ├── marketDetail.ts         # Market detail state atoms
+│   ├── predictionMarket.ts     # Prediction market atoms
+│   ├── profile.ts              # Profile state atoms
+│   └── subscriptions.ts        # Subscriptions state atoms
+├── providers/                   # Context providers
+│   └── JotaiProvider.tsx       # Jotai state provider
+├── types/                       # TypeScript type definitions
+│   ├── auth.ts                 # Authentication types
+│   ├── group.ts                # Group-related types
+│   └── market.ts               # Market-related types
+└── lib/                        # Utility libraries and configurations
 
 public/
-├── assets/              # Static assets
-│   ├── logo/           # Logo files
-│   ├── main/           # Main images and animations
-│   └── icons/          # Icon files
+├── assets/                      # Static assets
+│   ├── logo/                   # Logo files and branding
+│   │   └── logo-coin/          # Token logos
+│   ├── main/                   # Main images and animations
+│   │   ├── background/         # Background images
+│   │   └── animation/          # Lottie animations
+│   └── icons/                  # Icon files
+└── favicon.ico                 # Site favicon
 ```
 
 ## 🤝 Contributing
