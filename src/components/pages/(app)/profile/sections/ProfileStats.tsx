@@ -59,7 +59,7 @@ export const ProfileStats = ({
                 : "Unknown"}{" "}
               • {votesStats?.totalVotes || 0} predictions
             </div>
-            <div className="w-[45%]">
+            <div className="w-[27%]">
               <div className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-medium">
                 Free version
               </div>
