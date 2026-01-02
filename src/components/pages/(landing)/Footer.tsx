@@ -19,7 +19,7 @@ export const Footer = () => {
           
           <div className="mt-12 pt-8 border-t border-gray-200">
             <p className="text-sm text-gray-500">
-              &copy; 2024 Predictly. All rights reserved.
+              &copy; {new Date().getFullYear()} Predictly. All rights reserved.
             </p>
           </div>
         </motion.div>
