@@ -1,6 +1,7 @@
 "use client";
 
-import Image from 'next/image';
+import Link from "next/dist/client/link";
+import Image from "next/image";
 
 export const PredictionCard = () => {
   return (
@@ -18,9 +19,7 @@ export const PredictionCard = () => {
       <div className="relative z-10 flex flex-col h-179">
         <div className="flex items-start justify-between mb-8">
           <div className="flex items-center gap-2">
-            <h3 className="text-xl font-medium text-black/80">
-              Built on 
-            </h3>
+            <h3 className="text-xl font-medium text-black/80">Built on</h3>
             <Image
               src="/assets/logo/movement-logo.png"
               alt="Movement Logo"
@@ -38,20 +37,23 @@ export const PredictionCard = () => {
             <p className="text-sm text-gray-600 font-medium">Create your prediction with your friends group</p>
           </div> */}
 
-        <button className="mb-4 cursor-pointer w-full bg-black text-slate-800 py-4 rounded-full font-medium hover:bg-white/35 transition-all duration-300 flex items-center justify-center gap-3">
-          <span className="font-medium text-xl text-white">
-            Explore Markets
-          </span>
-          <div className="bg-white/10 text-white rounded-full p-1.5">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </button>
+        <Link href="/app/create-market">
+          <button className="mb-4 cursor-pointer w-full bg-black text-slate-800 py-4 rounded-full font-medium hover:bg-white/35 transition-all duration-300 flex items-center justify-center gap-3">
+            <span className="font-medium text-xl text-white">
+              Explore Markets
+            </span>
+            <div className="bg-white/10 text-white rounded-full p-1.5">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          </button>
+        </Link>
+
         {/* </div> */}
       </div>
     </div>

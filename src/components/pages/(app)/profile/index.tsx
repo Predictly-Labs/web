@@ -632,7 +632,7 @@ export const ProfilePage: React.FC = () => {
                 </div>
 
                 <div className="text-xs text-gray-400 text-right">
-                  Polymarket
+                  Predictly
                 </div>
               </div>
 

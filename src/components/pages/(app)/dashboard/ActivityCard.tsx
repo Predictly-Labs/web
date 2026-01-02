@@ -26,7 +26,7 @@ export const ActivityCard = () => {
 
   return (
     <div
-      className="bg-gray-50 rounded-4xl p-4 sm:p-8 h-auto min-h-[280px] w-full relative overflow-hidden"
+      className="bg-gray-50 rounded-4xl p-4 sm:p-8 h-auto w-full relative overflow-hidden"
       style={{
         backgroundImage: "url('/assets/main/background/bg-main.png')",
         backgroundSize: "cover",
@@ -63,25 +63,74 @@ export const ActivityCard = () => {
           </div>
         </div>
 
-        <div className="flex items-end justify-between gap-1 h-16">
-          {weekData.map((item, index) => (
-            <div key={item.day} className="flex flex-col items-center flex-1">
-              <div
-                className={`w-full rounded-t-lg transition-all duration-300 ${
-                  index === 4 ? "bg-blue-400" : "bg-gray-200"
-                }`}
-                style={{ height: `${item.value}%` }}
-              ></div>
-            </div>
-          ))}
-        </div>
+        <div className="bg-gray-50 rounded-xl p-2 mt-4">
+          <div className="h-16 mb-2 relative">
+            <svg width="100%" height="100%" viewBox="0 0 280 64" className="overflow-visible">
+              <defs>
+                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="rgb(219, 39, 119)" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="rgb(255, 255, 255)" stopOpacity="0.1" />
+                </linearGradient>
+              </defs>
+              
+              {(() => {
+                const maxValue = Math.max(...weekData.map(d => d.value));
+                const points = weekData.map((item, index) => {
+                  const x = (index / (weekData.length - 1)) * 240 + 20;
+                  const y = 60 - ((item.value / maxValue) * 50);
+                  return `${x},${y}`;
+                }).join(' ');
+                
+                const areaPath = `M 20,60 L ${points.split(' ').map(point => {
+                  const [x, y] = point.split(',');
+                  return `${x},${y}`;
+                }).join(' L ')} L 260,60 Z`;
+                
+                const linePath = `M ${points.split(' ').join(' L ')}`;
+                
+                return (
+                  <>
+                    <path
+                      d={areaPath}
+                      fill="url(#areaGradient)"
+                      className="transition-all duration-500"
+                    />
+                    <path
+                      d={linePath}
+                      stroke="rgb(219, 39, 119)"
+                      strokeWidth="2"
+                      fill="none"
+                      className="transition-all duration-500"
+                    />
+                    {weekData.map((item, index) => {
+                      const x = (index / (weekData.length - 1)) * 240 + 20;
+                      const y = 60 - ((item.value / maxValue) * 50);
+                      return (
+                        <circle
+                          key={index}
+                          cx={x}
+                          cy={y}
+                          r="3"
+                          fill="rgb(219, 39, 119)"
+                          stroke="rgb(255, 255, 255)"
+                          strokeWidth="2"
+                          className="hover:r-4 transition-all duration-300 cursor-pointer"
+                        />
+                      );
+                    })}
+                  </>
+                );
+              })()}
+            </svg>
+          </div>
 
-        <div className="flex justify-between">
-          {weekData.map((item) => (
-            <span key={item.day} className="text-xs text-black-400">
-              {item.day}
-            </span>
-          ))}
+          <div className="flex justify-between">
+            {weekData.map((item) => (
+              <span key={item.day} className="text-xs text-gray-600 text-center flex-1">
+                {item.day}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
       </div>
