@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useGetGroups } from "@/hooks/useGetGroups";
 import Sidebar from "../../../ui/Sidebar";
-import { GroupData, ApiGroup } from "@/types/group";
+import { GroupData } from "@/types/group";
 import { CreateGroupForm } from "./CreateGroupForm";
 import { JoinGroupForm } from "./JoinGroupForm";
 import { GroupsHeader } from "./sections/GroupsHeader";
@@ -12,6 +12,14 @@ import { GroupsActions } from "./sections/GroupsActions";
 import { GroupsGrid } from "./sections/GroupsGrid";
 import { LoadingGrid } from "./sections/LoadingGrid";
 import { EmptyGroupsState } from "./sections/EmptyGroupsState";
+import { 
+  useTransformedGroups,
+  useGroupsLoading,
+  useGroupsError,
+  useCreateForm,
+  useJoinForm,
+  useGroupsActions
+} from "@/hooks/useGroupsState";
 
 interface GroupsProps {
   onGroupClick?: (group: GroupData) => void;
@@ -23,67 +31,64 @@ export const Groups: React.FC<GroupsProps> = ({
   groups = [],
 }) => {
   const router = useRouter();
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showJoinForm, setShowJoinForm] = useState(false);
   const { getGroups, groups: apiGroups, isLoading, error } = useGetGroups();
+  
+  const displayGroups = useTransformedGroups();
+  const { isLoading: globalLoading } = useGroupsLoading();
+  const { error: globalError } = useGroupsError();
+  const { showCreateForm } = useCreateForm();
+  const { showJoinForm } = useJoinForm();
+  const { 
+    handleCreateGroup,
+    handleJoinGroup,
+    handleFormSuccess,
+    handleCloseCreateForm,
+    handleCloseJoinForm,
+    updateApiGroups,
+    updateLoading,
+    updateError,
+    updateGroups
+  } = useGroupsActions();
 
   useEffect(() => {
-    getGroups({ page: 1, limit: 20 });
-  }, [getGroups]);
+    updateLoading(true);
+    getGroups({ page: 1, limit: 20 })
+      .then(() => {
+        updateApiGroups(apiGroups);
+        updateLoading(false);
+      })
+      .catch((err) => {
+        updateError(err.message);
+        updateLoading(false);
+      });
+  }, [getGroups, updateApiGroups, updateLoading, updateError]);
 
-  const transformApiGroups = (apiGroups: ApiGroup[]): GroupData[] => {
-    return apiGroups.map((group) => {
-      const memberCount =
-        group.stats?.memberCount || group._count?.members || 0;
-      const activeMarkets =
-        group.stats?.activeMarkets || group._count?.markets || 0;
-      const totalVolume = group.stats?.totalVolume || 0;
+  useEffect(() => {
+    if (groups.length > 0) {
+      updateGroups(groups);
+    }
+  }, [groups, updateGroups]);
 
-      return {
-        id: group.id,
-        name: group.name,
-        description: group.description,
-        avatar: group.iconUrl || "/assets/logo/logo.png",
-        memberCount,
-        activeMarkets,
-        totalVolume,
-        owner: "Group Owner",
-        members: [],
-        createdAt: group.createdAt,
-        isPrivate: !group.isPublic,
-        markets: [],
-        iconUrl: group.iconUrl,
-        inviteCode: undefined,
-        isPublic: group.isPublic,
-        createdById: undefined,
-        updatedAt: undefined,
-        createdBy: undefined,
-        _count: group._count,
-        userRole: undefined,
-        isMember: false,
-        stats: {
-          memberCount,
-          activeMarkets,
-          totalVolume,
-        },
-      };
-    });
-  };
+  useEffect(() => {
+    updateApiGroups(apiGroups);
+  }, [apiGroups, updateApiGroups]);
 
-  const displayGroups =
-    groups.length > 0 ? groups : transformApiGroups(apiGroups);
+  useEffect(() => {
+    updateLoading(isLoading);
+  }, [isLoading, updateLoading]);
+
+  useEffect(() => {
+    updateError(error);
+  }, [error, updateError]);
+
 
   const handleGroupClick = (group: GroupData) => {
     router.push(`/app/groups/${group.id}`);
     onGroupClick?.(group);
   };
 
-  const handleCreateGroup = () => setShowCreateForm(true);
-  const handleJoinGroup = () => setShowJoinForm(true);
-
-  const handleFormSuccess = () => {
-    setShowCreateForm(false);
-    setShowJoinForm(false);
+  const handleFormSuccessWithRefresh = () => {
+    handleFormSuccess();
     getGroups({ page: 1, limit: 20 });
   };
 
@@ -113,13 +118,13 @@ export const Groups: React.FC<GroupsProps> = ({
                 groupCount={displayGroups.length}
               />
 
-              {error && (
+              {(globalError || error) && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <p className="text-red-600 text-sm">{error}</p>
+                  <p className="text-red-600 text-sm">{globalError || error}</p>
                 </div>
               )}
 
-              {isLoading ? (
+              {(globalLoading || isLoading) ? (
                 <LoadingGrid />
               ) : displayGroups.length > 0 ? (
                 <GroupsGrid groups={displayGroups} onGroupClick={handleGroupClick} />
@@ -133,14 +138,14 @@ export const Groups: React.FC<GroupsProps> = ({
 
       <CreateGroupForm
         isOpen={showCreateForm}
-        onClose={() => setShowCreateForm(false)}
-        onSuccess={handleFormSuccess}
+        onClose={handleCloseCreateForm}
+        onSuccess={handleFormSuccessWithRefresh}
       />
 
       <JoinGroupForm
         isOpen={showJoinForm}
-        onClose={() => setShowJoinForm(false)}
-        onSuccess={handleFormSuccess}
+        onClose={handleCloseJoinForm}
+        onSuccess={handleFormSuccessWithRefresh}
       />
     </div>
   );

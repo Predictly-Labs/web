@@ -1,12 +1,15 @@
 import { Users, Plus } from "lucide-react";
+import { useTransformedGroups } from "@/hooks/useGroupsState";
 
 interface GroupsActionsProps {
   onJoinGroup: () => void;
   onCreateGroup: () => void;
-  groupCount: number;
+  groupCount?: number;
 }
 
 export const GroupsActions = ({ onJoinGroup, onCreateGroup, groupCount }: GroupsActionsProps) => {
+  const transformedGroups = useTransformedGroups();
+  const displayGroupCount = groupCount ?? transformedGroups.length;
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between mb-8">
@@ -32,7 +35,7 @@ export const GroupsActions = ({ onJoinGroup, onCreateGroup, groupCount }: Groups
 
       <div className="flex items-center gap-2 text-sm text-gray-600">
         <Users className="w-4 h-4 text-black" />
-        <span>{groupCount} groups available</span>
+        <span>{displayGroupCount} groups available</span>
       </div>
     </div>
   );
