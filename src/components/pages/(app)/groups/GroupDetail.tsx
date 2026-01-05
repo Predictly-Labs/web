@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Settings, Copy } from "lucide-react";
+import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Settings, Copy, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useGetGroup } from "@/hooks/useGetGroupbyId";
 import { useGetGroupMarkets } from "@/hooks/useGetGroupMarkets";
@@ -189,6 +189,9 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
   const { getGroupMembers, members, isLoading: isLoadingMembers } = useGetGroupMembers();
   const [isJudgeManagementOpen, setIsJudgeManagementOpen] = useState(false);
   const [inviteCodeCopied, setInviteCodeCopied] = useState(false);
+  const [activeMarketsPage, setActiveMarketsPage] = useState(1);
+  const [closedMarketsPage, setClosedMarketsPage] = useState(1);
+  const marketsPerPage = 3;
 
   useEffect(() => {
     if (groupId) {
@@ -260,6 +263,18 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
   const closedMarkets = markets.filter(m => m.status.toUpperCase() === 'CLOSED');
   const judges = members.filter(member => member.role === 'JUDGE');
 
+  const activeMarketsTotal = Math.ceil(activeMarkets.length / marketsPerPage);
+  const activeMarketsStart = (activeMarketsPage - 1) * marketsPerPage;
+  const activeMarketsEnd = activeMarketsStart + marketsPerPage;
+  const currentActiveMarkets = activeMarkets.slice(activeMarketsStart, activeMarketsEnd);
+  const showActiveMarketsPagination = activeMarkets.length > marketsPerPage;
+
+  const closedMarketsTotal = Math.ceil(closedMarkets.length / marketsPerPage);
+  const closedMarketsStart = (closedMarketsPage - 1) * marketsPerPage;
+  const closedMarketsEnd = closedMarketsStart + marketsPerPage;
+  const currentClosedMarkets = closedMarkets.slice(closedMarketsStart, closedMarketsEnd);
+  const showClosedMarketsPagination = closedMarkets.length > marketsPerPage;
+
   return (
     <div className="p-3 sm:p-6 min-h-screen relative bg-[#f7f5fa]">
       <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
@@ -309,7 +324,7 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
               backgroundRepeat: "no-repeat",
             }}
           >
-            <div className="absolute inset-0 bg-white/70 h-192"></div>
+            <div className="absolute inset-0 bg-white/70 h-205"></div>
             <div className="relative z-10 space-y-6">
               
               <div className="bg-white rounded-2xl p-6 border border-gray-100 space-y-6">
@@ -432,7 +447,7 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
                     Active Markets ({activeMarkets.length})
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {activeMarkets.map(market => (
+                    {currentActiveMarkets.map(market => (
                       <MarketCard 
                         key={market.id} 
                         market={market}
@@ -441,6 +456,47 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
                       />
                     ))}
                   </div>
+                  
+                  {showActiveMarketsPagination && (
+                    <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-6 p-3 sm:p-4 bg-white rounded-lg border border-gray-200">
+                      <div className="text-xs text-gray-500 text-center sm:text-left">
+                        Showing {activeMarketsStart + 1}-{Math.min(activeMarketsEnd, activeMarkets.length)} of {activeMarkets.length} markets
+                      </div>
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => setActiveMarketsPage(prev => Math.max(prev - 1, 1))}
+                          disabled={activeMarketsPage === 1}
+                          className="p-2 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:hover:bg-white cursor-pointer"
+                        >
+                          <ChevronLeft className="w-4 h-4 text-gray-600" />
+                        </button>
+                        
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: activeMarketsTotal }, (_, i) => i + 1).map((pageNum) => (
+                            <button
+                              key={pageNum}
+                              onClick={() => setActiveMarketsPage(pageNum)}
+                              className={`w-8 h-8 rounded text-xs font-medium transition-colors cursor-pointer ${
+                                pageNum === activeMarketsPage
+                                  ? 'bg-black text-white'
+                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        <button
+                          onClick={() => setActiveMarketsPage(prev => Math.min(prev + 1, activeMarketsTotal))}
+                          disabled={activeMarketsPage === activeMarketsTotal}
+                          className="p-2 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:hover:bg-white cursor-pointer"
+                        >
+                          <ChevronRight className="w-4 h-4 text-gray-600" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </section>
               )}
 
@@ -451,7 +507,7 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
                     Closed Markets ({closedMarkets.length})
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {closedMarkets.map(market => (
+                    {currentClosedMarkets.map(market => (
                       <MarketCard 
                         key={market.id} 
                         market={market}
@@ -460,6 +516,47 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
                       />
                     ))}
                   </div>
+                  
+                  {showClosedMarketsPagination && (
+                    <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-6 p-3 sm:p-4 bg-white rounded-lg border border-gray-200">
+                      <div className="text-xs text-gray-500 text-center sm:text-left">
+                        Showing {closedMarketsStart + 1}-{Math.min(closedMarketsEnd, closedMarkets.length)} of {closedMarkets.length} markets
+                      </div>
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => setClosedMarketsPage(prev => Math.max(prev - 1, 1))}
+                          disabled={closedMarketsPage === 1}
+                          className="p-2 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:hover:bg-white cursor-pointer"
+                        >
+                          <ChevronLeft className="w-4 h-4 text-gray-600" />
+                        </button>
+                        
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: closedMarketsTotal }, (_, i) => i + 1).map((pageNum) => (
+                            <button
+                              key={pageNum}
+                              onClick={() => setClosedMarketsPage(pageNum)}
+                              className={`w-8 h-8 rounded text-xs font-medium transition-colors cursor-pointer ${
+                                pageNum === closedMarketsPage
+                                  ? 'bg-black text-white'
+                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        <button
+                          onClick={() => setClosedMarketsPage(prev => Math.min(prev + 1, closedMarketsTotal))}
+                          disabled={closedMarketsPage === closedMarketsTotal}
+                          className="p-2 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:hover:bg-white cursor-pointer"
+                        >
+                          <ChevronRight className="w-4 h-4 text-gray-600" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </section>
               )}
 
