@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Settings } from "lucide-react";
+import { ArrowLeft, Calendar, Users, TrendingUp, Clock, Settings, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useGetGroup } from "@/hooks/useGetGroupbyId";
 import { useGetGroupMarkets } from "@/hooks/useGetGroupMarkets";
@@ -188,6 +188,7 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
   const { getGroupMarkets, markets, isLoading: isLoadingMarkets, error: marketsError } = useGetGroupMarkets();
   const { getGroupMembers, members, isLoading: isLoadingMembers } = useGetGroupMembers();
   const [isJudgeManagementOpen, setIsJudgeManagementOpen] = useState(false);
+  const [inviteCodeCopied, setInviteCodeCopied] = useState(false);
 
   useEffect(() => {
     if (groupId) {
@@ -203,6 +204,18 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
 
   const handleMarketClick = (market: GroupMarket) => {
     router.push(`/app/${market.id}`);
+  };
+
+  const handleCopyInviteCode = async () => {
+    if (group?.inviteCode) {
+      try {
+        await navigator.clipboard.writeText(group.inviteCode);
+        setInviteCodeCopied(true);
+        setTimeout(() => setInviteCodeCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy invite code:', err);
+      }
+    }
   };
 
   if (isLoadingGroup || isLoadingMarkets) {
@@ -316,6 +329,24 @@ export const GroupDetail: React.FC<GroupDetailProps> = ({ groupId }) => {
                     <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{group.name}</h1>
                     {group.description && (
                       <p className="text-gray-600 text-sm leading-relaxed mb-4">{group.description}</p>
+                    )}
+                    
+                    {group.inviteCode && (
+                      <div className="bg-gray-50 rounded-lg p-2 mb-4 max-w-[10rem]">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs text-gray-500">Invite Code:</span>
+                          <button
+                            onClick={handleCopyInviteCode}
+                            className="p-1.5 hover:bg-gray-200 rounded transition-colors cursor-pointer"
+                            title={inviteCodeCopied ? "Copied!" : "Copy invite code"}
+                          >
+                            <Copy className={`w-4 h-4 ${inviteCodeCopied ? 'text-green-600' : 'text-gray-600'}`} />
+                          </button>
+                        </div>
+                        <code className="text-xs font-mono bg-white px-2 py-1 rounded border text-gray-900 block mt-1">
+                          {group.inviteCode}
+                        </code>
+                      </div>
                     )}
                   </div>
                 </div>
