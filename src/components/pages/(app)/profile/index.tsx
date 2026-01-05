@@ -266,7 +266,7 @@ export const ProfilePage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-6">
+                <div className="p-3">
                   {activeTab === "positions" && <PositionsTab />}
                   {activeTab === "activity" && <ActivityTab />}
                 </div>

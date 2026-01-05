@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 import { useProfileGroups } from "@/hooks/useProfileState"
 
 interface ActivityData {
@@ -16,7 +17,7 @@ export const ProfileSidebar = ({ activityData }: ProfileSidebarProps) => {
 
   return (
     <div className="lg:col-span-1">
-      <div className="bg-white rounded-2xl p-6 border border-gray-200">
+      <div className="bg-white rounded-2xl px-6 py-3 border border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div className="text-sm text-gray-500">Profit/Loss</div>
           <div className="flex gap-1 text-xs">
@@ -57,7 +58,7 @@ export const ProfileSidebar = ({ activityData }: ProfileSidebarProps) => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 mt-6">
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 mt-6 h-98">
         <h3 className="text-sm text-gray-500 mb-4">My Groups</h3>
         {isLoadingGroups ? (
           <div className="flex items-center justify-center py-4">
@@ -99,11 +100,14 @@ export const ProfileSidebar = ({ activityData }: ProfileSidebarProps) => {
                 </div>
               ))}
             </div>
-            {hasMoreGroups && (
+            {(hasMoreGroups || groups.length >= 3) && (
               <div className="mt-4 pt-3 border-t border-gray-100">
-                <button className="text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">
+                <Link 
+                  href="/app/groups" 
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+                >
                   View all groups
-                </button>
+                </Link>
               </div>
             )}
           </>
